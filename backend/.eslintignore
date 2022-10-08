@@ -1,0 +1,25 @@
+/docs
+/docs-util
+/www
+typedoc.*
+jest*
+
+packages/*
+# List of packages to Lint
+!packages/medusa
+
+integration-tests/*
+#!integration-tests/api
+
+
+**/models/*
+**/scripts/*
+**/dist/*
+**/node_modules/*
+**/migrations/*
+**/services/*
+**/repository/*
+**/__mocks__/*
+**/__tests__/*
+
+.eslintrc.js
