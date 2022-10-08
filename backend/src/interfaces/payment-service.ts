@@ -6,7 +6,8 @@ import {
   PaymentSession,
   PaymentSessionStatus,
 } from "../models"
-import { PaymentService } from "medusa-interfaces"
+// @ts-ignore
+import {PaymentService} from "medusa-interfaces/dist"
 
 export type Data = Record<string, unknown>
 export type PaymentData = Data
@@ -50,8 +51,11 @@ export interface PaymentService<T extends TransactionBaseService>
   getStatus(data: Data): Promise<PaymentSessionStatus>
 }
 
+
+
 export abstract class AbstractPaymentService<T extends TransactionBaseService>
   extends TransactionBaseService
+  // @ts-ignore
   implements PaymentService<T>
 {
   protected constructor(container: unknown, config?: Record<string, unknown>) {

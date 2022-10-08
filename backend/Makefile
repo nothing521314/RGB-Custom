@@ -1,5 +1,5 @@
 deploy:
-	ssh -p 2356 gameroot@103.170.207.189 "mkdir -p ~/RGB/admin"
+	ssh -p 2356 gameroot@103.170.207.189 "mkdir -p ~/RGB/backend"
 	rsync -avhzL --delete \
 				--no-perms --no-owner --no-group \
 				--exclude .git \
@@ -8,9 +8,8 @@ deploy:
 				--exclude .idea \
 				--exclude docker \
 				--exclude .env \
-				--exclude .cache \
 				--exclude .env.development \
 				--exclude dist \
 				--exclude package-lock.json \
 				--exclude node_modules \
-				. gameroot@103.170.207.189:~/RGB/admin
+				. gameroot@103.170.207.189:~/RGB/backend

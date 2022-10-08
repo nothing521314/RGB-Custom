@@ -60,96 +60,19 @@ const t = async function ({ directory, migrate, seedFile }) {
 
   const manager = container.resolve("manager")
 
-  const storeService = container.resolve("storeService")
   const userService = container.resolve("userService")
-  const regionService = container.resolve("regionService")
-  const productService = container.resolve("productService")
-  const productVariantService = container.resolve("productVariantService")
-  const shippingOptionService = container.resolve("shippingOptionService")
-  const shippingProfileService = container.resolve("shippingProfileService")
 
   await manager.transaction(async (tx) => {
-    const { store, regions, products, shipping_options, users } = JSON.parse(
+    const { users } = JSON.parse(
       fs.readFileSync(resolvedPath, `utf-8`)
     )
-
-    const gcProfile = await shippingProfileService.retrieveGiftCardDefault()
-    const defaultProfile = await shippingProfileService.retrieveDefault()
-
-    if (store) {
-      await storeService.withTransaction(tx).update(store)
-    }
 
     for (const u of users) {
       const pass = u.password
       if (pass) {
         delete u.password
       }
-      await userService.withTransaction(tx).create(u)
-    }
-
-    const regionIds = {}
-    for (const r of regions) {
-      let dummyId
-      if (!r.id || !r.id.startsWith("reg_")) {
-        dummyId = r.id
-        delete r.id
-      }
-
-      const reg = await regionService.withTransaction(tx).create(r)
-
-        if (dummyId) {
-        regionIds[dummyId] = reg.id
-      }
-    }
-
-    for (const so of shipping_options) {
-      if (regionIds[so.region_id]) {
-        so.region_id = regionIds[so.region_id]
-      }
-
-      so.profile_id = defaultProfile.id
-      if (so.is_giftcard) {
-        so.profile_id = gcProfile.id
-        delete so.is_giftcard
-      }
-
-      await shippingOptionService.withTransaction(tx).create(so)
-    }
-
-    for (const p of products) {
-      const variants = p.variants
-      delete p.variants
-
-      // default to the products being visible
-      p.status = p.status || "published"
-
-      p.profile_id = defaultProfile.id
-      if (p.is_giftcard) {
-        p.profile_id = gcProfile.id
-      }
-
-      const newProd = await productService.withTransaction(tx).create(p)
-
-        if (variants && variants.length) {
-        const optionIds = p.options.map(
-          (o) => newProd.options.find((newO) => newO.title === o.title).id
-        )
-
-        for (const v of variants) {
-          const variant = {
-            ...v,
-            options: v.options.map((o, index) => ({
-              ...o,
-              option_id: optionIds[index],
-            })),
-          }
-
-          await productVariantService
-            .withTransaction(tx)
-            .create(newProd.id)
-        }
-      }
+      await userService.withTransaction(tx).create(u, pass)
     }
   })
 

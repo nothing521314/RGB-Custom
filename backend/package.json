@@ -53,6 +53,7 @@
     "migrations:run": "yarn run build && node dist/migrations.js run",
     "migrations:show": "yarn run build && node dist/migrations.js show",
     "migrations:revert": "yarn run build && node dist/migrations.js revert",
+    "migrations:gen": "ts-node node_modules/.bin/typeorm migration:generate -n",
     "seed": "yarn run build && node dist/seeds.js",
     "test": "jest",
     "test:unit": "jest"
