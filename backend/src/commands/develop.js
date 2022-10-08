@@ -18,8 +18,8 @@ export default async function({ port, directory }) {
     stdio: ["ignore", process.stdout, process.stderr],
   })
 
-  const cliPath = path.join(directory, "node_modules", ".bin", "medusa")
-  let child = spawn(cliPath, [`start`, ...args], {
+  const cliPath = path.join("yarn")
+  let child = spawn(cliPath, [`serve`, ...args], {
     cwd: directory,
     env: process.env,
     stdio: ["pipe", process.stdout, process.stderr],
@@ -42,7 +42,7 @@ export default async function({ port, directory }) {
 
     Logger.info("Rebuilt")
 
-    child = spawn(cliPath, [`start`, ...args], {
+    child = spawn(cliPath, [`serve`, ...args], {
       cwd: directory,
       env: process.env,
       stdio: ["pipe", process.stdout, process.stderr],

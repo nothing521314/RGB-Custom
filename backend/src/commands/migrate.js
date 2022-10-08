@@ -5,13 +5,13 @@ import Logger from "../loaders/logger"
 
 import getMigrations from "./utils/get-migrations"
 
-const t = async function ({ directory }) {
-  const args = process.argv
-  args.shift()
+const t = async function ({ directory, args }) {
   args.shift()
   args.shift()
 
   const { configModule } = getConfigFile(directory, `medusa-config`)
+
+  console.log(configModule)
 
   const featureFlagRouter = featureFlagLoader(configModule)
 

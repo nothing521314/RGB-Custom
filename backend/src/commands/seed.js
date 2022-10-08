@@ -33,6 +33,8 @@ const t = async function ({ directory, migrate, seedFile }) {
 
   const featureFlagRouter = featureFlagLoader(configModule)
 
+  console.log(directory)
+
   const dbType = configModule.projectConfig.database_type
   if (migrate && dbType !== "sqlite") {
     const migrationDirs = await getMigrations(directory, featureFlagRouter)
