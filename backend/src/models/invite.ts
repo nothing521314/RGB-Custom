@@ -2,8 +2,8 @@ import { BeforeInsert, Column, CreateDateColumn, Entity, Index } from "typeorm"
 import { DbAwareColumn, resolveDbType } from "../utils/db-aware-column"
 
 import { SoftDeletableEntity } from "../interfaces/models/soft-deletable-entity"
-import { UserRoles } from "./user"
 import { generateEntityId } from "../utils/generate-entity-id"
+import {UserRoles} from "../common/configurations";
 
 @Entity()
 export class Invite extends SoftDeletableEntity {
@@ -15,7 +15,7 @@ export class Invite extends SoftDeletableEntity {
     type: "enum",
     enum: UserRoles,
     nullable: true,
-    default: UserRoles.MEMBER,
+    default: UserRoles.SALEMAN,
   })
   role: UserRoles
 

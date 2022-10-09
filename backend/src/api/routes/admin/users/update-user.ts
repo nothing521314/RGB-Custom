@@ -1,9 +1,9 @@
-import { IsEnum, IsObject, IsOptional, IsString } from "class-validator"
+import {IsArray, IsEnum, IsNotEmpty, IsObject, IsOptional, IsString} from "class-validator"
 
-import { UserRoles } from "../../../../models/user"
 import UserService from "../../../../services/user"
 import { validator } from "../../../../utils/validator"
 import { EntityManager } from "typeorm"
+import {UserRoles} from "../../../../common/configurations";
 
 /**
  * @oas [post] /users/{id}
@@ -102,11 +102,11 @@ export default async (req, res) => {
 export class AdminUpdateUserRequest {
   @IsString()
   @IsOptional()
-  first_name?: string
+  name?: string
 
   @IsString()
   @IsOptional()
-  last_name?: string
+  phone?: string
 
   @IsEnum(UserRoles)
   @IsOptional()
@@ -115,6 +115,10 @@ export class AdminUpdateUserRequest {
   @IsString()
   @IsOptional()
   api_token?: string
+
+  @IsArray()
+  @IsNotEmpty()
+  regions: string[]
 
   @IsObject()
   @IsOptional()

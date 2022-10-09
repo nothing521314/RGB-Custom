@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 import { MedusaError } from "medusa-core-utils"
 import Scrypt from "scrypt-kdf"
-import { EntityManager } from "typeorm"
+import {DeepPartial, EntityManager} from "typeorm"
 import { TransactionBaseService } from "../interfaces"
 import { User } from "../models"
 import { UserRepository } from "../repositories/user"
@@ -14,9 +14,11 @@ import {
 import { buildQuery, setMetadata } from "../utils"
 import { validateEmail } from "../utils/is-email"
 import EventBusService from "./event-bus"
+import {RegionRepository} from "../repositories/region";
 
 type UserServiceProps = {
   userRepository: typeof UserRepository
+  regionRepository: typeof RegionRepository
   eventBusService: EventBusService
   manager: EntityManager
 }
@@ -36,12 +38,14 @@ class UserService extends TransactionBaseService {
   protected manager_: EntityManager
   protected transactionManager_: EntityManager
   protected readonly userRepository_: typeof UserRepository
+  protected readonly regionRepository_: typeof RegionRepository
   protected readonly eventBus_: EventBusService
 
-  constructor({ userRepository, eventBusService, manager }: UserServiceProps) {
-    super({ userRepository, eventBusService, manager })
+  constructor({ userRepository, regionRepository, eventBusService, manager }: UserServiceProps) {
+    super({ userRepository, regionRepository, eventBusService, manager })
 
     this.userRepository_ = userRepository
+    this.regionRepository_ = regionRepository
     this.eventBus_ = eventBusService
     this.manager_ = manager
   }
@@ -157,6 +161,7 @@ class UserService extends TransactionBaseService {
   async create(user: CreateUserInput, password: string): Promise<User> {
     return await this.atomicPhase_(async (manager: EntityManager) => {
       const userRepo = manager.getCustomRepository(this.userRepository_)
+      const regionRepo = manager.getCustomRepository(this.regionRepository_)
 
       const createData = { ...user } as CreateUserInput & {
         password_hash: string
@@ -168,9 +173,18 @@ class UserService extends TransactionBaseService {
         createData.password_hash = hashedPassword
       }
 
+      const validateRegions = await regionRepo.findByIds(user.regions || [])
+
+      if(validateRegions.length === 0 && user.regions !== undefined){
+        throw new MedusaError(
+            MedusaError.Types.INVALID_DATA,
+            "Regions invalid"
+        )
+      }
+
       createData.email = validatedEmail
 
-      const created = userRepo.create(createData)
+      const created = userRepo.create({...createData, regions: validateRegions})
 
       const newUser = await userRepo.save(created)
 
@@ -191,6 +205,7 @@ class UserService extends TransactionBaseService {
   async update(userId: string, update: UpdateUserInput): Promise<User> {
     return await this.atomicPhase_(async (manager: EntityManager) => {
       const userRepo = manager.getCustomRepository(this.userRepository_)
+      const regionRepo = manager.getCustomRepository(this.regionRepository_)
 
       const user = await this.retrieve(userId)
 
@@ -209,6 +224,18 @@ class UserService extends TransactionBaseService {
           "Use dedicated methods, `setPassword`, `generateResetPasswordToken` for password operations"
         )
       }
+
+      const validateRegions = await regionRepo.findByIds(user.regions || [])
+
+      if(validateRegions.length === 0 && user.regions !== undefined){
+        throw new MedusaError(
+            MedusaError.Types.INVALID_DATA,
+            "Regions invalid"
+        )
+      }
+
+      if(validateRegions.length > 0)
+        user.regions = validateRegions
 
       if (metadata) {
         user.metadata = setMetadata(user, metadata)

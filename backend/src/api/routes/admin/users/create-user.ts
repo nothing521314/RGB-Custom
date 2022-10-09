@@ -1,10 +1,11 @@
-import { IsEmail, IsEnum, IsOptional, IsString } from "class-validator"
+import {IsArray, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString} from "class-validator"
 
-import { UserRoles } from "../../../../models/user"
 import UserService from "../../../../services/user"
 import _ from "lodash"
 import { validator } from "../../../../utils/validator"
 import { EntityManager } from "typeorm"
+import {UserRoles} from "../../../../common/configurations";
+import {Region} from "../../../../models";
 
 /**
  * @oas [post] /users
@@ -107,20 +108,25 @@ export default async (req, res) => {
 
 export class AdminCreateUserRequest {
   @IsEmail()
+  @IsNotEmpty()
   email: string
 
-  @IsOptional()
   @IsString()
-  first_name?: string
+  @IsNotEmpty()
+  name: string
 
-  @IsOptional()
   @IsString()
-  last_name?: string
+  @IsNotEmpty()
+  phone: string
 
   @IsEnum(UserRoles)
   @IsOptional()
-  role?: UserRoles
+  role?: UserRoles.SALEMAN
 
   @IsString()
   password: string
+
+  @IsArray()
+  @IsNotEmpty()
+  regions: string[]
 }

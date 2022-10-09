@@ -1,14 +1,11 @@
-import { BeforeInsert, Column, Entity, Index } from "typeorm"
+import {BeforeInsert, Column, Entity, Index, JoinTable, ManyToMany} from "typeorm"
 
 import { DbAwareColumn } from "../utils/db-aware-column"
 import { SoftDeletableEntity } from "../interfaces/models/soft-deletable-entity"
 import { generateEntityId } from "../utils/generate-entity-id"
-
-export enum UserRoles {
-  ADMIN = "admin",
-  MEMBER = "member",
-  DEVELOPER = "developer",
-}
+import {UserRoles} from "../common/configurations";
+import {Region} from "./region";
+import {Product} from "./product";
 
 @Entity()
 export class User extends SoftDeletableEntity {
@@ -16,7 +13,7 @@ export class User extends SoftDeletableEntity {
     type: "enum",
     enum: UserRoles,
     nullable: true,
-    default: UserRoles.MEMBER,
+    default: UserRoles.SALEMAN,
   })
   role: UserRoles
 
@@ -25,16 +22,33 @@ export class User extends SoftDeletableEntity {
   email: string
 
   @Column({ nullable: true })
-  first_name: string
+  name: string
 
   @Column({ nullable: true })
-  last_name: string
+  phone: string
 
   @Column({ nullable: true, select: false })
   password_hash: string
 
   @Column({ nullable: true })
   api_token: string
+
+  @ManyToMany(() => Region, {
+    eager: true,
+    cascade: ["insert", "update"],
+  })
+  @JoinTable({
+    name: "user_region",
+    joinColumn: {
+      name: "user_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "region_id",
+      referencedColumnName: "id",
+    },
+  })
+  regions: Region[]
 
   @DbAwareColumn({ type: "jsonb", nullable: true })
   metadata: Record<string, unknown>

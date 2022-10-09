@@ -4,11 +4,11 @@ import { BaseService } from "medusa-interfaces"
 import { EntityManager } from "typeorm"
 import { EventBusService, UserService } from "."
 import { User } from ".."
-import { UserRoles } from "../models/user"
 import { InviteRepository } from "../repositories/invite"
 import { UserRepository } from "../repositories/user"
 import { ListInvite } from "../types/invites"
 import { ConfigModule } from "../types/global"
+import {UserRoles} from "../common/configurations";
 
 // 7 days
 const DEFAULT_VALID_DURATION = 1000 * 60 * 60 * 24 * 7
@@ -246,8 +246,8 @@ class InviteService extends BaseService {
         {
           email: invite.user_email,
           role: invite.role,
-          first_name: user_.first_name,
-          last_name: user_.last_name,
+          name: user_.name,
+          phone: user_.phone,
         },
         user_.password
       )

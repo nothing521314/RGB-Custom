@@ -20,6 +20,7 @@ import { TaxRate } from "./tax-rate"
 import { generateEntityId } from "../utils/generate-entity-id"
 import { FeatureFlagColumn } from "../utils/feature-flag-decorators"
 import TaxInclusivePricingFeatureFlag from "../loaders/feature-flags/tax-inclusive-pricing"
+import {User} from "./user";
 
 @Entity()
 export class Region extends SoftDeletableEntity {
@@ -91,6 +92,20 @@ export class Region extends SoftDeletableEntity {
     },
   })
   fulfillment_providers: FulfillmentProvider[]
+
+  @ManyToMany(() => User)
+  @JoinTable({
+    name: "user_region",
+    joinColumn: {
+      name: "region_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "user_id",
+      referencedColumnName: "id",
+    },
+  })
+  users: User[]
 
   @DbAwareColumn({ type: "jsonb", nullable: true })
   metadata: Record<string, unknown>
