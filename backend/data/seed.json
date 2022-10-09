@@ -7,5 +7,43 @@
       "email": "admin@admin.com",
       "password": "admin"
     }
+  ],
+  "regions": [
+    {
+      "id": "region-vietname",
+      "name": "Viet Nam",
+      "currency_code": "usd",
+      "tax_rate": 0,
+      "payment_providers": [],
+      "fulfillment_providers": [],
+      "countries": ["vn"]
+    },
+    {
+      "id": "region-malaysia",
+      "name": "Malaysia",
+      "currency_code": "usd",
+      "tax_rate": 0,
+      "payment_providers": [],
+      "fulfillment_providers": [],
+      "countries": ["my"]
+    },
+    {
+      "id": "region-singapore",
+      "name": "Singapore",
+      "currency_code": "usd",
+      "tax_rate": 0,
+      "payment_providers": [],
+      "fulfillment_providers": [],
+      "countries": ["sg"]
+    },
+    {
+      "id": "region-cambodia",
+      "name": "Cambodia",
+      "currency_code": "usd",
+      "tax_rate": 0,
+      "payment_providers": [],
+      "fulfillment_providers": [],
+      "countries": ["kh"]
+    }
   ]
 }
