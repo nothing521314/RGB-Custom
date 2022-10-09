@@ -8,6 +8,23 @@
       "password": "admin"
     }
   ],
+  "productCollections": [
+    {
+      "title": "Slot Machine"
+    },
+    {
+      "title": "Electronic Table Games (ETG)"
+    },
+    {
+      "title": "Spare Parts"
+    },
+    {
+      "title": "Casino Management System (CMS)"
+    },
+    {
+      "title": "Other"
+    }
+  ],
   "regions": [
     {
       "id": "region-vietname",

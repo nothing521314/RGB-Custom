@@ -62,9 +62,10 @@ const t = async function ({ directory, migrate, seedFile }) {
 
   const userService = container.resolve("userService")
   const regionService = container.resolve("regionService")
+  const collectionService = container.resolve("productCollectionService")
 
   await manager.transaction(async (tx) => {
-    const { users, regions } = JSON.parse(
+    const { users, regions, productCollections } = JSON.parse(
       fs.readFileSync(resolvedPath, `utf-8`)
     )
 
@@ -74,6 +75,10 @@ const t = async function ({ directory, migrate, seedFile }) {
         delete u.password
       }
       await userService.withTransaction(tx).create(u, pass)
+    }
+
+    for(const c of productCollections){
+      await collectionService.withTransaction(tx).create(c);
     }
 
     const regionIds = {}
