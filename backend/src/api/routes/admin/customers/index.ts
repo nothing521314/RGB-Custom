@@ -17,6 +17,7 @@ export default (app) => {
 
   route.post("/", middlewares.wrap(require("./create-customer").default))
   route.post("/:id", middlewares.wrap(require("./update-customer").default))
+  route.post("/:id/delete", middlewares.wrap(require("./delete-customer").default))
   return app
 }
 
@@ -36,3 +37,4 @@ export * from "./create-customer"
 export * from "./get-customer"
 export * from "./list-customers"
 export * from "./update-customer"
+export * from "./delete-customer"

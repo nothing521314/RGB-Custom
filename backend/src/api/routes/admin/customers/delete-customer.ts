@@ -113,77 +113,29 @@ import {PERSON_IN_CHARGE} from "../../../../common/configurations";
 export default async (req, res) => {
   const { id } = req.params
 
-  const validatedBody = await validator(AdminPostCustomersCustomerReq, req.body)
   const validatedQuery = await validator(FindParams, req.query)
 
   const customerService: CustomerService = req.scope.resolve("customerService")
 
   let customer = await customerService.retrieve(id)
 
-  if (validatedBody.email && customer.has_account) {
+  if (!customer) {
     throw new MedusaError(
       MedusaError.Types.INVALID_DATA,
-      "Email cannot be changed when the user has registered their account"
+      "Cannot find customer"
     )
   }
 
   const manager: EntityManager = req.scope.resolve("manager")
   await manager.transaction(async (transactionManager) => {
-    return await customerService
+    const deleteResult =  await customerService
       .withTransaction(transactionManager)
-      .update(id, validatedBody)
+      .delete(id)
+
+    console.log(deleteResult);
+
+    res.status(200).json({ deleteResult })
   })
 
-  let expandFields: string[] = []
-  if (validatedQuery.expand) {
-    expandFields = validatedQuery.expand.split(",")
-  }
-
-  const findConfig = {
-    relations: expandFields.length
-      ? expandFields
-      : defaultAdminCustomersRelations,
-  }
-
-  customer = await customerService.retrieve(id, findConfig)
-
   res.status(200).json({ customer })
-}
-
-class Group {
-  @IsString()
-  id: string
-}
-
-export class AdminPostCustomersCustomerReq {
-  @IsEmail()
-  @IsOptional()
-  email?: string
-
-  @IsString()
-  @IsOptional()
-  name?: string
-
-  @IsString()
-  @IsEnum(PERSON_IN_CHARGE)
-  @IsOptional()
-  person_in_charge?: string
-
-  @IsString()
-  @IsOptional()
-  address?: string
-
-  @IsString()
-  @IsOptional()
-  phone?: string
-
-  @IsObject()
-  @IsOptional()
-  metadata?: Record<string, unknown>
-
-  @IsArray()
-  @IsOptional()
-  @Type(() => Group)
-  @ValidateNested({ each: true })
-  groups?: Group[]
 }

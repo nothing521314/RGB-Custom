@@ -65,8 +65,8 @@ export const orderExportPropertiesDescriptors: OrderDescriptor[] = [
     ].join(";"),
     accessor: (order: Order): string =>
       [
-        order.customer.first_name,
-        order.customer.last_name,
+        order.customer.name,
+        order.customer.person_in_charge,
         order.customer.email,
         order.customer.id,
       ].join(";"),

@@ -17,8 +17,9 @@ export type CreateCustomerInput = {
   password_hash?: string
   has_account?: boolean
 
-  first_name?: string
-  last_name?: string
+  name?: string
+  person_in_charge?: string
+  address?: string
   phone?: string
   metadata?: Record<string, unknown>
 }

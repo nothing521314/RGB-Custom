@@ -8,7 +8,7 @@ export default (container, config) => {
   const app = Router()
 
   admin(app, container, config)
-  store(app, container, config)
+  // store(app, container, config)
 
   app.use(errorHandler())
 

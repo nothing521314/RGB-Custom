@@ -16,6 +16,7 @@ import { DbAwareColumn } from "../utils/db-aware-column"
 import { Order } from "./order"
 import { SoftDeletableEntity } from "../interfaces/models/soft-deletable-entity"
 import { generateEntityId } from "../utils/generate-entity-id"
+import {PERSON_IN_CHARGE} from "../common/configurations";
 
 @Entity()
 export class Customer extends SoftDeletableEntity {
@@ -24,10 +25,13 @@ export class Customer extends SoftDeletableEntity {
   email: string
 
   @Column({ nullable: true })
-  first_name: string
+  name: string
+
+  @Column({ type: "enum", enum: PERSON_IN_CHARGE, default: PERSON_IN_CHARGE.DEFAULT, nullable: true })
+  person_in_charge: string
 
   @Column({ nullable: true })
-  last_name: string
+  address: string
 
   @Index()
   @Column({ nullable: true })

@@ -17,8 +17,8 @@ export class CustomerRepository extends Repository<Customer> {
 
     if (q) {
       delete query.where.email
-      delete query.where.first_name
-      delete query.where.last_name
+      delete query.where.name
+      delete query.where.person_in_charge
 
       qb.where(
         new Brackets((qb) => {

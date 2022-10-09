@@ -1,8 +1,9 @@
-import { IsEmail, IsObject, IsOptional, IsString } from "class-validator"
+import {IsEmail, IsEnum, IsObject, IsOptional, IsString} from "class-validator"
 
 import { CustomerService } from "../../../../services"
 import { validator } from "../../../../utils/validator"
 import { EntityManager } from "typeorm"
+import {PERSON_IN_CHARGE} from "../../../../common/configurations";
 
 /**
  * @oas [post] /customers
@@ -113,13 +114,14 @@ export class AdminPostCustomersReq {
   email: string
 
   @IsString()
-  first_name: string
+  name: string
 
   @IsString()
-  last_name: string
+  @IsEnum(PERSON_IN_CHARGE)
+  person_in_charge: string
 
   @IsString()
-  password: string
+  address: string
 
   @IsString()
   @IsOptional()
