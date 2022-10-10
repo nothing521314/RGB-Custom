@@ -2,7 +2,7 @@ import { Transform, Type } from "class-transformer"
 import {
   IsArray,
   IsBoolean,
-  IsEnum,
+  IsEnum, IsNotEmpty, IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
@@ -159,6 +159,12 @@ export type CreateProductInput = {
   origin_country?: string
   mid_code?: string
   material?: string
+  prices?:CreateProductProductPricesInput[]
+  additional_hardware?: CreateProductAdditionalHardwareInput[] | null
+  brand?: string
+  dimension?: string
+  delivery_lead_time?: Date
+  warranty?: string
   metadata?: Record<string, unknown>
 }
 
@@ -166,6 +172,16 @@ export type CreateProductProductTagInput = {
   id?: string
   value: string
 }
+
+export type CreateProductProductPricesInput = {
+  region: string
+  value: number
+}
+
+export type CreateProductAdditionalHardwareInput = {
+  id : string
+}
+
 
 export type CreateProductProductSalesChannelInput = {
   id: string
@@ -259,6 +275,21 @@ export class ProductTagReq {
 
   @IsString()
   value: string
+}
+
+export class ProductAdditionalHardwareReq {
+  @IsString()
+  id: string
+}
+
+export class ProductPriceReq {
+  @IsNotEmpty()
+  @IsString()
+  region: string
+
+  @IsNotEmpty()
+  @IsNumber()
+  value: number
 }
 
 export class ProductTypeReq {

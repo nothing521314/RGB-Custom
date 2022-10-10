@@ -3,9 +3,10 @@ import {
   ProductVariantPricesCreateReq,
 } from "../../../../types/product-variant"
 import {
+  ArrayMinSize,
   IsArray,
-  IsBoolean,
-  IsEnum,
+  IsBoolean, IsDate,
+  IsEnum, IsNotEmpty,
   IsNumber,
   IsObject,
   IsOptional,
@@ -19,6 +20,7 @@ import {
   ShippingProfileService,
 } from "../../../../services"
 import {
+  ProductAdditionalHardwareReq, ProductPriceReq,
   ProductSalesChannelReq,
   ProductTagReq,
   ProductTypeReq,
@@ -301,66 +303,14 @@ export default async (req, res) => {
 
   const productService: ProductService = req.scope.resolve("productService")
   const pricingService: PricingService = req.scope.resolve("pricingService")
-  const productVariantService: ProductVariantService = req.scope.resolve(
-    "productVariantService"
-  )
-  const shippingProfileService: ShippingProfileService = req.scope.resolve(
-    "shippingProfileService"
-  )
 
   const entityManager: EntityManager = req.scope.resolve("manager")
 
   const newProduct = await entityManager.transaction(async (manager) => {
-    const { variants } = validated
-    delete validated.variants
-
-    if (!validated.thumbnail && validated.images && validated.images.length) {
-      validated.thumbnail = validated.images[0]
-    }
-
-    let shippingProfile
-    // Get default shipping profile
-    if (validated.is_giftcard) {
-      shippingProfile = await shippingProfileService
-        .withTransaction(manager)
-        .retrieveGiftCardDefault()
-    } else {
-      shippingProfile = await shippingProfileService
-        .withTransaction(manager)
-        .retrieveDefault()
-    }
 
     const newProduct = await productService
       .withTransaction(manager)
-      .create({ ...validated, profile_id: shippingProfile.id })
-
-    if (variants) {
-      for (const [i, variant] of variants.entries()) {
-        variant["variant_rank"] = i
-      }
-
-      const optionIds =
-        validated?.options?.map(
-          (o) => newProduct.options.find((newO) => newO.title === o.title)?.id
-        ) || []
-
-      await Promise.all(
-        variants.map(async (v) => {
-          const variant = {
-            ...v,
-            options:
-              v?.options?.map((o, index) => ({
-                ...o,
-                option_id: optionIds[index],
-              })) || [],
-          }
-
-          await productVariantService
-            .withTransaction(manager)
-            .create(newProduct.id, variant as CreateProductVariantInput)
-        })
-      )
-    }
+      .create({ ...validated })
 
     return newProduct
   })
@@ -375,196 +325,53 @@ export default async (req, res) => {
   res.json({ product })
 }
 
-class ProductVariantOptionReq {
-  @IsString()
-  value: string
-}
-
-class ProductOptionReq {
-  @IsString()
-  title: string
-}
-
-class ProductVariantReq {
-  @IsString()
-  title: string
-
-  @IsString()
-  @IsOptional()
-  sku?: string
-
-  @IsString()
-  @IsOptional()
-  ean?: string
-
-  @IsString()
-  @IsOptional()
-  upc?: string
-
-  @IsString()
-  @IsOptional()
-  barcode?: string
-
-  @IsString()
-  @IsOptional()
-  hs_code?: string
-
-  @IsNumber()
-  @IsOptional()
-  inventory_quantity = 0
-
-  @IsBoolean()
-  @IsOptional()
-  allow_backorder?: boolean
-
-  @IsBoolean()
-  @IsOptional()
-  manage_inventory?: boolean
-
-  @IsNumber()
-  @IsOptional()
-  weight?: number
-
-  @IsNumber()
-  @IsOptional()
-  length?: number
-
-  @IsNumber()
-  @IsOptional()
-  height?: number
-
-  @IsNumber()
-  @IsOptional()
-  width?: number
-
-  @IsString()
-  @IsOptional()
-  origin_country?: string
-
-  @IsString()
-  @IsOptional()
-  mid_code?: string
-
-  @IsString()
-  @IsOptional()
-  material?: string
-
-  @IsObject()
-  @IsOptional()
-  metadata?: Record<string, unknown>
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ProductVariantPricesCreateReq)
-  prices: ProductVariantPricesCreateReq[]
-
-  @IsOptional()
-  @Type(() => ProductVariantOptionReq)
-  @ValidateNested({ each: true })
-  @IsArray()
-  options?: ProductVariantOptionReq[] = []
-}
-
 export class AdminPostProductsReq {
   @IsString()
   title: string
 
   @IsString()
   @IsOptional()
-  subtitle?: string
-
-  @IsString()
-  @IsOptional()
   description?: string
-
-  @IsBoolean()
-  is_giftcard = false
-
-  @IsBoolean()
-  discountable = true
 
   @IsArray()
   @IsOptional()
   images?: string[]
 
+  @IsNotEmpty()
   @IsString()
-  @IsOptional()
-  thumbnail?: string
-
-  @IsString()
-  @IsOptional()
-  handle?: string
+  collection_id: string
 
   @IsOptional()
-  @IsEnum(ProductStatus)
-  status?: ProductStatus = ProductStatus.DRAFT
-
-  @IsOptional()
-  @Type(() => ProductTypeReq)
-  @ValidateNested()
-  type?: ProductTypeReq
-
-  @IsOptional()
-  @IsString()
-  collection_id?: string
-
-  @IsOptional()
-  @Type(() => ProductTagReq)
+  @Type(() => ProductAdditionalHardwareReq)
   @ValidateNested({ each: true })
   @IsArray()
-  tags?: ProductTagReq[]
+  additional_hardwares?: ProductAdditionalHardwareReq[]
 
-  @FeatureFlagDecorators(SalesChannelFeatureFlag.key, [
-    IsOptional(),
-    Type(() => ProductSalesChannelReq),
-    ValidateNested({ each: true }),
-    IsArray(),
-  ])
-  sales_channels?: ProductSalesChannelReq[]
-
-  @IsOptional()
-  @Type(() => ProductOptionReq)
+  @Type(() => ProductPriceReq)
   @ValidateNested({ each: true })
   @IsArray()
-  options?: ProductOptionReq[]
-
-  @IsOptional()
-  @Type(() => ProductVariantReq)
-  @ValidateNested({ each: true })
-  @IsArray()
-  variants?: ProductVariantReq[]
+  @ArrayMinSize(1)
+  prices: ProductPriceReq[]
 
   @IsNumber()
   @IsOptional()
   weight?: number
 
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  length?: number
-
-  @IsNumber()
-  @IsOptional()
-  height?: number
-
-  @IsNumber()
-  @IsOptional()
-  width?: number
+  brand?: string
 
   @IsString()
   @IsOptional()
-  hs_code?: string
+  dimension?: string
+
+  @IsDate()
+  @IsOptional()
+  delivery_lead_time?: Date
 
   @IsString()
   @IsOptional()
-  origin_country?: string
-
-  @IsString()
-  @IsOptional()
-  mid_code?: string
-
-  @IsString()
-  @IsOptional()
-  material?: string
+  warranty?: string
 
   @IsObject()
   @IsOptional()

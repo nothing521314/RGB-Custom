@@ -33,6 +33,7 @@ import {
 import { buildQuery, isDefined, setMetadata } from "../utils"
 import { formatException } from "../utils/exception-formatter"
 import EventBusService from "./event-bus"
+import {ProductPriceRepository} from "../repositories/product-price";
 
 type InjectedDependencies = {
   manager: EntityManager
@@ -46,6 +47,7 @@ type InjectedDependencies = {
   searchService: SearchService
   eventBusService: EventBusService
   featureFlagRouter: FlagRouter
+  productPriceRepository: typeof ProductPriceRepository
 }
 
 class ProductService extends TransactionBaseService {
@@ -360,6 +362,8 @@ class ProductService extends TransactionBaseService {
         tags,
         type,
         images,
+        prices,
+        additional_hardware,
         sales_channels: salesChannels,
         ...rest
       } = productObject
@@ -374,7 +378,7 @@ class ProductService extends TransactionBaseService {
       }
 
       try {
-        let product = productRepo.create(rest)
+        let product = productRepo.create({...rest})
 
         if (images?.length) {
           product.images = await imageRepo.upsertImages(images)
@@ -386,6 +390,14 @@ class ProductService extends TransactionBaseService {
 
         if (typeof type !== `undefined`) {
           product.type_id = (await productTypeRepo.upsertType(type))?.id || null
+        }
+
+        if(additional_hardware?.length){
+          let ids = []
+          additional_hardware.map(item => {
+            ids.push(item.id)
+          })
+          product.additional_hardwares = await productRepo.findByIds(ids)
         }
 
         if (

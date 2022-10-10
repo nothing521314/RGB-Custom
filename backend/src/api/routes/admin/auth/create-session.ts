@@ -85,6 +85,8 @@ export default async (req, res) => {
       "Please configure jwt_secret in your environment"
     )
   }
+
+
   const validated = await validator(AdminPostAuthReq, req.body)
 
   const authService: AuthService = req.scope.resolve("authService")

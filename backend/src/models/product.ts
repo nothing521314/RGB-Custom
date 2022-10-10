@@ -23,6 +23,8 @@ import { ShippingProfile } from "./shipping-profile"
 import { SoftDeletableEntity } from "../interfaces/models/soft-deletable-entity"
 import _ from "lodash"
 import { generateEntityId } from "../utils/generate-entity-id"
+import {FulfillmentItem} from "./fulfillment-item";
+import {ProductPrice} from "./product-price";
 
 export enum ProductStatus {
   DRAFT = "draft",
@@ -36,11 +38,29 @@ export class Product extends SoftDeletableEntity {
   @Column()
   title: string
 
+  @Column()
+  brand: string
+
+  @Column({ type: "text", nullable: true })
+  dimension: string | null
+
+  @Column({ type: "date", nullable: true })
+  delivery_lead_time: Date | null
+
+  @Column({ type: "text", nullable: true })
+  warranty: Date | null
+
   @Column({ type: "text", nullable: true })
   subtitle: string | null
 
   @Column({ type: "text", nullable: true })
   description: string | null
+
+  @OneToMany(() => Product, (i) => i.id)
+  additional_hardwares: Product[]
+
+  @OneToMany(() => ProductPrice, (i) => i.product,{ cascade: ["insert"] })
+  prices: ProductPrice[]
 
   @Index({ unique: true, where: "deleted_at IS NULL" })
   @Column({ type: "text", nullable: true })
@@ -78,7 +98,7 @@ export class Product extends SoftDeletableEntity {
   variants: ProductVariant[]
 
   @Index()
-  @Column()
+  @Column({nullable: true})
   profile_id: string
 
   @ManyToOne(() => ShippingProfile)

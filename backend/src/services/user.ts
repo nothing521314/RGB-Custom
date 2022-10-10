@@ -127,7 +127,6 @@ class UserService extends TransactionBaseService {
   ): Promise<User> {
     const manager = this.manager_
     const userRepo = manager.getCustomRepository(this.userRepository_)
-
     const query = buildQuery({ email: email.toLowerCase() }, config)
     const user = await userRepo.findOne(query)
 
