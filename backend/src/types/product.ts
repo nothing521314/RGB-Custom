@@ -66,6 +66,14 @@ export class FilterableProductProps {
   @IsOptional()
   type?: string
 
+  @IsString()
+  @IsOptional()
+  additional_hardware_ids?: string
+
+  @IsString()
+  @IsOptional()
+  price_ids?: string
+
   @IsArray()
   @IsOptional()
   sales_channel_id?: string[]
@@ -160,7 +168,7 @@ export type CreateProductInput = {
   mid_code?: string
   material?: string
   prices?:CreateProductProductPricesInput[]
-  additional_hardware?: CreateProductAdditionalHardwareInput[] | null
+  additional_hardwares?: CreateProductAdditionalHardwareInput[] | null
   brand?: string
   dimension?: string
   delivery_lead_time?: Date

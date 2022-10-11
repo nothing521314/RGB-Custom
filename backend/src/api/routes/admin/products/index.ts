@@ -22,52 +22,18 @@ export default (app, featureFlagRouter: FlagRouter) => {
     validateSalesChannelsExist((req) => req.body?.sales_channels),
     middlewares.wrap(require("./create-product").default)
   )
+
   route.post(
     "/:id",
     validateSalesChannelsExist((req) => req.body?.sales_channels),
     middlewares.wrap(require("./update-product").default)
-  )
-  route.get("/types", middlewares.wrap(require("./list-types").default))
-  route.get(
-    "/tag-usage",
-    middlewares.wrap(require("./list-tag-usage-count").default)
-  )
-
-  route.get(
-    "/:id/variants",
-    middlewares.normalizeQuery(),
-    middlewares.wrap(require("./list-variants").default)
-  )
-  route.post(
-    "/:id/variants",
-    middlewares.wrap(require("./create-variant").default)
-  )
-
-  route.post(
-    "/:id/variants/:variant_id",
-    middlewares.wrap(require("./update-variant").default)
-  )
-
-  route.post(
-    "/:id/options/:option_id",
-    middlewares.wrap(require("./update-option").default)
-  )
-  route.post("/:id/options", middlewares.wrap(require("./add-option").default))
-
-  route.delete(
-    "/:id/variants/:variant_id",
-    middlewares.wrap(require("./delete-variant").default)
-  )
-  route.delete("/:id", middlewares.wrap(require("./delete-product").default))
-  route.delete(
-    "/:id/options/:option_id",
-    middlewares.wrap(require("./delete-option").default)
   )
 
   route.post(
     "/:id/metadata",
     middlewares.wrap(require("./set-metadata").default)
   )
+
   route.get(
     "/:id",
     transformQuery(EmptyQueryParams, {
@@ -102,6 +68,8 @@ export const defaultAdminProductRelations = [
   "tags",
   "type",
   "collection",
+  "prices",
+  "additional_hardwares"
 ]
 
 export const defaultAdminProductFields: (keyof Product)[] = [

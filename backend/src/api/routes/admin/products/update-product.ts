@@ -1,6 +1,7 @@
 import {
+  ArrayMinSize,
   IsArray,
-  IsBoolean,
+  IsBoolean, IsDate,
   IsEnum,
   IsInt,
   IsNumber,
@@ -13,6 +14,7 @@ import {
 } from "class-validator"
 import { PricingService, ProductService } from "../../../../services"
 import {
+  ProductAdditionalHardwareReq, ProductPriceReq,
   ProductSalesChannelReq,
   ProductTagReq,
   ProductTypeReq,
@@ -491,6 +493,36 @@ export class AdminPostProductsProductReq {
   @IsString()
   @IsOptional()
   material?: string
+
+  @IsOptional()
+  @Type(() => ProductAdditionalHardwareReq)
+  @ValidateNested({ each: true })
+  @IsArray()
+  additional_hardwares?: ProductAdditionalHardwareReq[]
+
+
+  @Type(() => ProductPriceReq)
+  @ValidateNested({ each: true })
+  @IsArray()
+  @ArrayMinSize(1)
+  prices: ProductPriceReq[]
+
+
+  @IsString()
+  @IsOptional()
+  brand?: string
+
+  @IsString()
+  @IsOptional()
+  dimension?: string
+
+  @IsDate()
+  @IsOptional()
+  delivery_lead_time?: Date
+
+  @IsString()
+  @IsOptional()
+  warranty?: string
 
   @IsObject()
   @IsOptional()

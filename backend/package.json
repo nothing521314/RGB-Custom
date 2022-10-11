@@ -54,6 +54,7 @@
     "migrations:show": "yarn run build && node dist/migrations.js show",
     "migrations:revert": "yarn run build && node dist/migrations.js revert",
     "migrations:gen": "ts-node node_modules/.bin/typeorm migration:generate -n",
+    "migrations:clean": "ts-node node_modules/.bin/typeorm cache:clear",
     "seed": "yarn run build && node dist/seeds.js",
     "test": "jest",
     "test:unit": "jest"

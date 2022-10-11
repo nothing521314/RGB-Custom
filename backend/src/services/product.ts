@@ -7,7 +7,7 @@ import { TransactionBaseService } from "../interfaces"
 import SalesChannelFeatureFlag from "../loaders/feature-flags/sales-channels"
 import {
   Product,
-  ProductOption,
+  ProductOption, ProductPrice,
   ProductTag,
   ProductType,
   ProductVariant,
@@ -34,6 +34,7 @@ import { buildQuery, isDefined, setMetadata } from "../utils"
 import { formatException } from "../utils/exception-formatter"
 import EventBusService from "./event-bus"
 import {ProductPriceRepository} from "../repositories/product-price";
+import {ProductAdditionalHardware} from "../models/product-additional-hardware";
 
 type InjectedDependencies = {
   manager: EntityManager
@@ -363,7 +364,7 @@ class ProductService extends TransactionBaseService {
         type,
         images,
         prices,
-        additional_hardware,
+        additional_hardwares,
         sales_channels: salesChannels,
         ...rest
       } = productObject
@@ -378,7 +379,36 @@ class ProductService extends TransactionBaseService {
       }
 
       try {
-        let product = productRepo.create({...rest})
+        let priceList = []
+        let additionalHardwareList = []
+
+        prices.map(item => {
+          const price = new ProductPrice()
+          price.region_id = item.region
+          price.price = item.value
+
+          priceList.push(price)
+        })
+
+
+        if(additional_hardwares?.length){
+          let ids = []
+          additional_hardwares.map(item => {
+            ids.push(item.id)
+          })
+
+          const results = await productRepo.findByIds(ids)
+
+          results.map(item => {
+            const additional = new ProductAdditionalHardware()
+            additional.product_additions_id = item.id
+
+            additionalHardwareList.push(additional)
+          })
+          //Todo: check type of additional hardware
+        }
+
+        let product = productRepo.create({...rest, prices: priceList, additional_hardwares: additionalHardwareList})
 
         if (images?.length) {
           product.images = await imageRepo.upsertImages(images)
@@ -390,14 +420,6 @@ class ProductService extends TransactionBaseService {
 
         if (typeof type !== `undefined`) {
           product.type_id = (await productTypeRepo.upsertType(type))?.id || null
-        }
-
-        if(additional_hardware?.length){
-          let ids = []
-          additional_hardware.map(item => {
-            ids.push(item.id)
-          })
-          product.additional_hardwares = await productRepo.findByIds(ids)
         }
 
         if (

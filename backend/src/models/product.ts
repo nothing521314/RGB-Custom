@@ -25,6 +25,7 @@ import _ from "lodash"
 import { generateEntityId } from "../utils/generate-entity-id"
 import {FulfillmentItem} from "./fulfillment-item";
 import {ProductPrice} from "./product-price";
+import {ProductAdditionalHardware} from "./product-additional-hardware";
 
 export enum ProductStatus {
   DRAFT = "draft",
@@ -56,10 +57,12 @@ export class Product extends SoftDeletableEntity {
   @Column({ type: "text", nullable: true })
   description: string | null
 
-  @OneToMany(() => Product, (i) => i.id)
-  additional_hardwares: Product[]
+  @OneToMany(() => ProductAdditionalHardware, (i) => i.product_parent, { cascade: true, eager: true,})
+  @JoinColumn({ name: "additional_hardware_ids" })
+  additional_hardwares: ProductAdditionalHardware[]
 
-  @OneToMany(() => ProductPrice, (i) => i.product,{ cascade: ["insert"] })
+  @OneToMany(() => ProductPrice, (i) => i.product,{ cascade: true, eager: true,})
+  @JoinColumn({ name: "price_ids" })
   prices: ProductPrice[]
 
   @Index({ unique: true, where: "deleted_at IS NULL" })
