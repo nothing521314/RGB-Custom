@@ -95,4 +95,8 @@ export class AdminGetCustomersParams extends AdminListCustomerSelector {
   @IsString()
   @IsOptional()
   expand?: string
+
+  @IsString()
+  @IsOptional()
+  q?: string
 }

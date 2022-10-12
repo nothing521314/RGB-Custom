@@ -24,8 +24,7 @@ export class CustomerRepository extends Repository<Customer> {
         new Brackets((qb) => {
           //@ts-ignore
           qb.where({ email: ILike(`%${q}%`) })
-            .orWhere({ first_name: ILike(`%${q}%`) })
-            .orWhere({ last_name: ILike(`%${q}%`) })
+            .orWhere({ name: ILike(`%${q}%`) })
         })
       )
     }
