@@ -4,195 +4,85 @@ import {
   Entity,
   Index,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
 } from "typeorm"
 
-import { DbAwareColumn } from "../utils/db-aware-column"
-import { FeatureFlagDecorators } from "../utils/feature-flag-decorators"
-import { Image } from "./image"
-import { ProductCollection } from "./product-collection"
-import { ProductOption } from "./product-option"
-import { ProductTag } from "./product-tag"
-import { ProductType } from "./product-type"
-import { ProductVariant } from "./product-variant"
-import { SalesChannel } from "./sales-channel"
-import { ShippingProfile } from "./shipping-profile"
 import { SoftDeletableEntity } from "../interfaces/models/soft-deletable-entity"
-import _ from "lodash"
 import { generateEntityId } from "../utils/generate-entity-id"
-import {FulfillmentItem} from "./fulfillment-item";
-import {ProductPrice} from "./product-price";
-import {ProductAdditionalHardware} from "./product-additional-hardware";
-
-export enum ProductStatus {
-  DRAFT = "draft",
-  PROPOSED = "proposed",
-  PUBLISHED = "published",
-  REJECTED = "rejected",
-}
+import {User} from "./user";
+import {Customer} from "./customer";
+import {Region} from "./region";
+import {QoutationLine} from "./quotation-line";
 
 @Entity()
-export class Product extends SoftDeletableEntity {
+export class Quotation extends SoftDeletableEntity {
+
+  @Index()
+  @Column({nullable: true})
+  sale_persion_id: string
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: "sale_persion_id" })
+  sale_persion: User
+
   @Column()
   title: string
 
   @Column()
-  brand: string
+  code: string
+
+  @Column({ type: "date", nullable: true })
+  date: Date | null
+
+  @Index()
+  @Column({nullable: true})
+  customer_id: string
+
+  @ManyToOne(() => Customer)
+  @JoinColumn({ name: "customer_id" })
+  customer: Customer
+
+  @Index()
+  @Column({nullable: true})
+  region_id: string
+
+  @ManyToOne(() => Region)
+  @JoinColumn({ name: "region_id" })
+  region: Region
+
+  @OneToMany(() => QoutationLine, (i) => i.product,{ cascade: true, eager: true,})
+  quotation_lines: QoutationLine[]
 
   @Column({ type: "text", nullable: true })
-  dimension: string | null
+  heading: Date | null
+
+  @Column({ type: "text", nullable: true })
+  condition: Date | null
+
+  @Column({ type: "text", nullable: true })
+  payment_term: Date | null
 
   @Column({ type: "date", nullable: true })
   delivery_lead_time: Date | null
 
   @Column({ type: "text", nullable: true })
-  warranty: Date | null
+  warranty: string | null
 
   @Column({ type: "text", nullable: true })
-  subtitle: string | null
+  install_support: string | null
 
   @Column({ type: "text", nullable: true })
-  description: string | null
-
-  @OneToMany(() => ProductAdditionalHardware, (i) => i.product_parent, { cascade: true, eager: true,})
-  @JoinColumn({ name: "additional_hardware_ids" })
-  additional_hardwares: ProductAdditionalHardware[]
-
-  @OneToMany(() => ProductPrice, (i) => i.product,{ cascade: true, eager: true,})
-  @JoinColumn({ name: "price_ids" })
-  prices: ProductPrice[]
-
-  @Index({ unique: true, where: "deleted_at IS NULL" })
-  @Column({ type: "text", nullable: true })
-  handle: string | null
-
-  @Column({ default: false })
-  is_giftcard: boolean
-
-  @DbAwareColumn({ type: "enum", enum: ProductStatus, default: "draft" })
-  status: ProductStatus
-
-  @ManyToMany(() => Image, { cascade: ["insert"] })
-  @JoinTable({
-    name: "product_images",
-    joinColumn: {
-      name: "product_id",
-      referencedColumnName: "id",
-    },
-    inverseJoinColumn: {
-      name: "image_id",
-      referencedColumnName: "id",
-    },
-  })
-  images: Image[]
+  appendix_a: string | null
 
   @Column({ type: "text", nullable: true })
-  thumbnail: string | null
-
-  @OneToMany(() => ProductOption, (productOption) => productOption.product)
-  options: ProductOption[]
-
-  @OneToMany(() => ProductVariant, (variant) => variant.product, {
-    cascade: true,
-  })
-  variants: ProductVariant[]
-
-  @Index()
-  @Column({nullable: true})
-  profile_id: string
-
-  @ManyToOne(() => ShippingProfile)
-  @JoinColumn({ name: "profile_id" })
-  profile: ShippingProfile
-
-  @Column({ type: "int", nullable: true })
-  weight: number | null
-
-  @Column({ type: "int", nullable: true })
-  length: number | null
-
-  @Column({ type: "int", nullable: true })
-  height: number | null
-
-  @Column({ type: "int", nullable: true })
-  width: number | null
-
-  @Column({ type: "text", nullable: true })
-  hs_code: string | null
-
-  @Column({ type: "text", nullable: true })
-  origin_country: string | null
-
-  @Column({ type: "text", nullable: true })
-  mid_code: string | null
-
-  @Column({ type: "text", nullable: true })
-  material: string | null
-
-  @Column({ type: "text", nullable: true })
-  collection_id: string | null
-
-  @ManyToOne(() => ProductCollection)
-  @JoinColumn({ name: "collection_id" })
-  collection: ProductCollection
-
-  @Column({ type: "text", nullable: true })
-  type_id: string | null
-
-  @ManyToOne(() => ProductType)
-  @JoinColumn({ name: "type_id" })
-  type: ProductType
-
-  @ManyToMany(() => ProductTag)
-  @JoinTable({
-    name: "product_tags",
-    joinColumn: {
-      name: "product_id",
-      referencedColumnName: "id",
-    },
-    inverseJoinColumn: {
-      name: "product_tag_id",
-      referencedColumnName: "id",
-    },
-  })
-  tags: ProductTag[]
-
-  @Column({ default: true })
-  discountable: boolean
-
-  @Column({ type: "text", nullable: true })
-  external_id: string | null
-
-  @DbAwareColumn({ type: "jsonb", nullable: true })
-  metadata: Record<string, unknown> | null
-
-  @FeatureFlagDecorators("sales_channels", [
-    ManyToMany(() => SalesChannel, { cascade: ["remove", "soft-remove"] }),
-    JoinTable({
-      name: "product_sales_channel",
-      joinColumn: {
-        name: "product_id",
-        referencedColumnName: "id",
-      },
-      inverseJoinColumn: {
-        name: "sales_channel_id",
-        referencedColumnName: "id",
-      },
-    }),
-  ])
-  sales_channels: SalesChannel[]
+  appendix_b: string | null
 
   @BeforeInsert()
   private beforeInsert(): void {
     if (this.id) return
 
-    this.id = generateEntityId(this.id, "prod")
-    if (!this.handle) {
-      this.handle = _.kebabCase(this.title)
-    }
+    this.id = generateEntityId(this.id, "quot")
   }
 }
 

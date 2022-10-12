@@ -16,76 +16,49 @@ import {User} from "./user";
 import {Customer} from "./customer";
 import {Region} from "./region";
 import {ProductPrice} from "./product-price";
+import {Product} from "./product";
+import {Quotation} from "./quotation";
 
 @Entity()
-export class Qoutation extends SoftDeletableEntity {
+export class QoutationLine extends SoftDeletableEntity {
+  @Index()
+  @Column({nullable: false})
+  product_id: string
+
+  @ManyToOne(() => Product)
+  @JoinColumn({ name: "product_id" })
+  product: Product
 
   @Index()
-  @Column({nullable: true})
-  sale_persion_id: string
+  @Column({nullable: false})
+  qoutation_id: string
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: "sale_persion_id" })
-  sale_persion: User
+  @ManyToOne(() => Quotation)
+  @JoinColumn({ name: "qoutation_id" })
+  qoutation: Quotation
 
-  @Column()
-  title: string
+  @Column({ type: "int", nullable: false })
+  volume: number
 
-  @Column()
-  code: string
+  @Column({ type: "int", nullable: false })
+  unit_price: number
 
-  @Column({ type: "date", nullable: true })
-  date: Date | null
-
-  @Index()
-  @Column({nullable: true})
-  customer_id: string
-
-  @ManyToOne(() => Customer)
-  @JoinColumn({ name: "customer_id" })
-  customer: Customer
+  @OneToMany(() => QoutationLine, (i) => i.parent_product_id,{ cascade: true, eager: true,})
+  chill_product: QoutationLine[]
 
   @Index()
-  @Column({nullable: true})
-  region_id: string
+  @Column({nullable: false})
+  parent_product_id: string
 
-  @ManyToOne(() => Region)
-  @JoinColumn({ name: "region_id" })
-  region: Region
-
-  @OneToMany(() => ProductPrice, (i) => i.product,{ cascade: true, eager: true,})
-  @JoinColumn({ name: "price_ids" })
-  products: ProductPrice[]
-
-  @Column({ type: "text", nullable: true })
-  heading: Date | null
-
-  @Column({ type: "text", nullable: true })
-  condition: Date | null
-
-  @Column({ type: "text", nullable: true })
-  payment_term: Date | null
-
-  @Column({ type: "date", nullable: true })
-  delivery_lead_time: Date | null
-
-  @Column({ type: "text", nullable: true })
-  warranty: string | null
-
-  @Column({ type: "text", nullable: true })
-  install_support: string | null
-
-  @Column({ type: "text", nullable: true })
-  appendix_a: string | null
-
-  @Column({ type: "text", nullable: true })
-  appendix_b: string | null
+  @ManyToOne(() => QoutationLine)
+  @JoinColumn({ name: "parent_product_id" })
+  parent_product: QoutationLine
 
   @BeforeInsert()
   private beforeInsert(): void {
     if (this.id) return
 
-    this.id = generateEntityId(this.id, "quot")
+    this.id = generateEntityId(this.id, "quot_line")
   }
 }
 
