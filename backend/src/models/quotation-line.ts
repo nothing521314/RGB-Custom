@@ -22,7 +22,7 @@ import {Quotation} from "./quotation";
 @Entity()
 export class QuotationLine extends SoftDeletableEntity {
   @Index()
-  @Column({nullable: false})
+  @Column({nullable: true})
   product_id: string
 
   @ManyToOne(() => Product)
@@ -30,7 +30,7 @@ export class QuotationLine extends SoftDeletableEntity {
   product: Product
 
   @Index()
-  @Column({nullable: false})
+  @Column({nullable: true})
   quotation_id: string
 
   @ManyToOne(() => Quotation)
@@ -43,14 +43,14 @@ export class QuotationLine extends SoftDeletableEntity {
   @Column({ type: "int", nullable: false })
   unit_price: number
 
-  @OneToMany(() => QuotationLine, (i) => i.parent_product_id,{ cascade: true, eager: true,})
+  @OneToMany(() => QuotationLine, (i) => i.parent_product_id,{ cascade: true, eager: true, nullable: true})
   child_product: QuotationLine[]
 
   @Index()
-  @Column({nullable: false})
+  @Column({nullable: true})
   parent_product_id: string
 
-  @ManyToOne(() => QuotationLine)
+  @ManyToOne(() => QuotationLine, {cascade: true, eager: true, nullable: true})
   @JoinColumn({ name: "parent_product_id" })
   parent_product: QuotationLine
 

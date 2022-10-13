@@ -32,7 +32,6 @@ export default async (req, res) => {
   const entityManager: EntityManager = req.scope.resolve("manager")
 
   const newQuotation = await entityManager.transaction(async (manager) => {
-
     const quotation = await quotationService
       .withTransaction(manager)
       .create({ ...validated })
@@ -83,10 +82,12 @@ export class AdminPostQuotationReq {
 
   @IsNotEmpty()
   @IsDate()
+  @Type(() => Date)
   delivery_lead_time: Date
 
   @IsNotEmpty()
   @IsDate()
+  @Type(() => Date)
   date: Date
 
   @IsNotEmpty()
@@ -127,7 +128,9 @@ export class AdminPostQuotationLineReq {
   @Min(1)
   volume: number
 
-  @IsNotEmpty()
-  @IsString()
+  @IsOptional()
+  @Type(() => AdminPostQuotationLineReq)
+  @ValidateNested({ each: true })
+  @IsArray()
   child_product?: AdminPostQuotationLineReq[]
 }

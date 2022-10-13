@@ -51,7 +51,7 @@ export class Quotation extends SoftDeletableEntity {
   @JoinColumn({ name: "region_id" })
   region: Region
 
-  @OneToMany(() => QuotationLine, (i) => i.product,{ cascade: true, eager: true,})
+  @OneToMany(() => QuotationLine, (i) => i.quotation,{ cascade: true, eager: true,})
   quotation_lines: QuotationLine[]
 
   @Column({ type: "text", nullable: true })

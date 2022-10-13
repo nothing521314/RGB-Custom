@@ -8,11 +8,12 @@ import middlewares, { transformQuery } from "../../../middlewares"
 import { validateSalesChannelsExist } from "../../../middlewares/validators/sales-channel-existence"
 // import { AdminGetProductsParams } from "./list-quotation"
 import {Quotation} from "../../../../models";
+import {AdminGetQuotationParams} from "./list-quotation";
 
 const route = Router()
 
 export default (app, featureFlagRouter: FlagRouter) => {
-  app.use("/quotation", route)
+  app.use("/quotations", route)
 
   if (featureFlagRouter.isFeatureEnabled("sales_channels")) {
     defaultAdminQuotationRelations.push("sales_channels")
@@ -35,27 +36,27 @@ export default (app, featureFlagRouter: FlagRouter) => {
   //   middlewares.wrap(require("./set-metadata").default)
   // )
   //
-  // route.get(
-  //   "/:id",
-  //   transformQuery(EmptyQueryParams, {
-  //     defaultRelations: defaultAdminQuotationRelations,
-  //     defaultFields: defaultAdminQuotationFields,
-  //     allowedFields: allowedAdminQuotationFields,
-  //     isList: false,
-  //   }),
-  //   middlewares.wrap(require("./get-quotation").default)
-  // )
-  //
-  // route.get(
-  //   "/",
-  //   transformQuery(AdminGetProductsParams, {
-  //     defaultRelations: defaultAdminQuotationRelations,
-  //     defaultFields: defaultAdminQuotationFields,
-  //     allowedFields: allowedAdminQuotationFields,
-  //     isList: true,
-  //   }),
-  //   middlewares.wrap(require("./list-quotation").default)
-  // )
+  route.get(
+    "/:id",
+    transformQuery(EmptyQueryParams, {
+      defaultRelations: defaultAdminQuotationRelations,
+      defaultFields: defaultAdminQuotationFields,
+      allowedFields: allowedAdminQuotationFields,
+      isList: false,
+    }),
+    middlewares.wrap(require("./get-quotation").default)
+  )
+
+  route.get(
+    "/",
+    transformQuery(AdminGetQuotationParams, {
+      defaultRelations: defaultAdminQuotationRelations,
+      defaultFields: defaultAdminQuotationFields,
+      allowedFields: allowedAdminQuotationFields,
+      isList: true,
+    }),
+    middlewares.wrap(require("./list-quotation").default)
+  )
 
   return app
 }
@@ -64,14 +65,15 @@ export const defaultAdminQuotationRelations = [
   "customer",
   "user",
   "region",
+  "quotation_lines"
 ]
 
 export const defaultAdminQuotationFields: (keyof Quotation)[] = [
   "id",
-  "sale_persion_id",
+  "sale_persion",
   "code",
   "date",
-  "customer_id",
+  "customer",
   "region_id",
   "quotation_lines",
   "heading",
@@ -146,6 +148,6 @@ export type AdminProductsRes = {
 
 export * from "./create-quotation"
 // export * from "./delete-quotation"
-// export * from "./get-quotation"
-// export * from "./list-quotation"
+export * from "./get-quotation"
+export * from "./list-quotation"
 // export * from "./update-quotation"
