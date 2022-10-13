@@ -20,7 +20,7 @@ import {Product} from "./product";
 import {Quotation} from "./quotation";
 
 @Entity()
-export class QoutationLine extends SoftDeletableEntity {
+export class QuotationLine extends SoftDeletableEntity {
   @Index()
   @Column({nullable: false})
   product_id: string
@@ -31,11 +31,11 @@ export class QoutationLine extends SoftDeletableEntity {
 
   @Index()
   @Column({nullable: false})
-  qoutation_id: string
+  quotation_id: string
 
   @ManyToOne(() => Quotation)
-  @JoinColumn({ name: "qoutation_id" })
-  qoutation: Quotation
+  @JoinColumn({ name: "quotation_id" })
+  quotation: Quotation
 
   @Column({ type: "int", nullable: false })
   volume: number
@@ -43,16 +43,16 @@ export class QoutationLine extends SoftDeletableEntity {
   @Column({ type: "int", nullable: false })
   unit_price: number
 
-  @OneToMany(() => QoutationLine, (i) => i.parent_product_id,{ cascade: true, eager: true,})
-  chill_product: QoutationLine[]
+  @OneToMany(() => QuotationLine, (i) => i.parent_product_id,{ cascade: true, eager: true,})
+  child_product: QuotationLine[]
 
   @Index()
   @Column({nullable: false})
   parent_product_id: string
 
-  @ManyToOne(() => QoutationLine)
+  @ManyToOne(() => QuotationLine)
   @JoinColumn({ name: "parent_product_id" })
-  parent_product: QoutationLine
+  parent_product: QuotationLine
 
   @BeforeInsert()
   private beforeInsert(): void {

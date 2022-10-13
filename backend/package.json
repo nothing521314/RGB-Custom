@@ -55,6 +55,7 @@
     "migrations:revert": "yarn run build && node dist/migrations.js revert",
     "migrations:gen": "ts-node node_modules/.bin/typeorm migration:generate -n",
     "migrations:clean": "ts-node node_modules/.bin/typeorm cache:clear",
+    "migrations:create": "ts-node node_modules/.bin/typeorm migration:create -n",
     "seed": "yarn run build && node dist/seeds.js",
     "test": "jest",
     "test:unit": "jest"
@@ -109,6 +110,7 @@
     "scrypt-kdf": "^2.0.1",
     "sqlite3": "^5.0.2",
     "swagger-inline": "^3.2.2",
+    "ts-node": "^10.9.1",
     "tslib": "1.11.2",
     "typeorm": "0.2.x",
     "ulid": "^2.3.0",

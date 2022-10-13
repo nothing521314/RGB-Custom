@@ -32,7 +32,7 @@ import taxRateRoutes from "./tax-rates"
 import uploadRoutes from "./uploads"
 import userRoutes, { unauthenticatedUserRoutes } from "./users"
 import variantRoutes from "./variants"
-
+import quotationRoutes from "./quotations"
 const route = Router()
 
 export default (app, container, config) => {
@@ -97,6 +97,6 @@ export default (app, container, config) => {
   uploadRoutes(route)
   userRoutes(route)
   variantRoutes(route)
-
+  quotationRoutes(route, featureFlagRouter)
   return app
 }

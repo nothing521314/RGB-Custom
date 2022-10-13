@@ -13,7 +13,7 @@ import { generateEntityId } from "../utils/generate-entity-id"
 import {User} from "./user";
 import {Customer} from "./customer";
 import {Region} from "./region";
-import {QoutationLine} from "./quotation-line";
+import {QuotationLine} from "./quotation-line";
 
 @Entity()
 export class Quotation extends SoftDeletableEntity {
@@ -51,8 +51,8 @@ export class Quotation extends SoftDeletableEntity {
   @JoinColumn({ name: "region_id" })
   region: Region
 
-  @OneToMany(() => QoutationLine, (i) => i.product,{ cascade: true, eager: true,})
-  quotation_lines: QoutationLine[]
+  @OneToMany(() => QuotationLine, (i) => i.product,{ cascade: true, eager: true,})
+  quotation_lines: QuotationLine[]
 
   @Column({ type: "text", nullable: true })
   heading: Date | null
