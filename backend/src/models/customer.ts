@@ -27,7 +27,7 @@ export class Customer extends SoftDeletableEntity {
   @Column({ nullable: true })
   name: string
 
-  @Column({ type: "enum", enum: PERSON_IN_CHARGE, default: PERSON_IN_CHARGE.DEFAULT, nullable: true })
+  @Column({  nullable: true })
   person_in_charge: string
 
   @Column({ nullable: true })

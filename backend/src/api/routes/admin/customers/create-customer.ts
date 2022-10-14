@@ -117,7 +117,6 @@ export class AdminPostCustomersReq {
   name: string
 
   @IsString()
-  @IsEnum(PERSON_IN_CHARGE)
   person_in_charge: string
 
   @IsString()

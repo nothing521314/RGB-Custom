@@ -208,7 +208,7 @@ class UserService extends TransactionBaseService {
 
       const user = await this.retrieve(userId)
 
-      const { email, password_hash, metadata, ...rest } = update
+      const { email, password_hash, metadata, regions, ...rest } = update
 
       if (email) {
         throw new MedusaError(
@@ -224,14 +224,14 @@ class UserService extends TransactionBaseService {
         )
       }
 
-      const validateRegions = await regionRepo.findByIds(user.regions || [])
+      const validateRegions = await regionRepo.findByIds(regions)
 
-      if(validateRegions.length === 0 && user.regions !== undefined){
-        throw new MedusaError(
-            MedusaError.Types.INVALID_DATA,
-            "Regions invalid"
-        )
-      }
+      // if(validateRegions.length === 0 && user.regions !== undefined){
+      //   throw new MedusaError(
+      //       MedusaError.Types.INVALID_DATA,
+      //       "Regions invalid"
+      //   )
+      // }
 
       if(validateRegions.length > 0)
         user.regions = validateRegions
