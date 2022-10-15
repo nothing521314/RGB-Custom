@@ -58,6 +58,9 @@ export class Quotation extends SoftDeletableEntity {
   heading: Date | null
 
   @Column({ type: "text", nullable: true })
+  header: Date | null
+
+  @Column({ type: "text", nullable: true })
   condition: Date | null
 
   @Column({ type: "text", nullable: true })

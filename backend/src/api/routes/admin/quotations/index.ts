@@ -24,12 +24,12 @@ export default (app, featureFlagRouter: FlagRouter) => {
     validateSalesChannelsExist((req) => req.body?.sales_channels),
     middlewares.wrap(require("./create-quotation").default)
   )
-  //
-  // route.post(
-  //   "/:id",
-  //   validateSalesChannelsExist((req) => req.body?.sales_channels),
-  //   middlewares.wrap(require("./update-quotation").default)
-  // )
+
+  route.delete(
+    "/:id",
+    validateSalesChannelsExist((req) => req.body?.sales_channels),
+    middlewares.wrap(require("./delete-quotation").default)
+  )
   //
   // route.post(
   //   "/:id/metadata",
@@ -74,6 +74,7 @@ export const defaultAdminQuotationFields: (keyof Quotation)[] = [
   "code",
   "date",
   "heading",
+    "header",
   "condition",
   "payment_term",
   "delivery_lead_time",
@@ -94,6 +95,7 @@ export const allowedAdminQuotationFields = [
   "customer_id",
   "region_id",
   "heading",
+    "header",
   "condition",
   "payment_term",
   "delivery_lead_time",

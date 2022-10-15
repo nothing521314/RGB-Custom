@@ -429,39 +429,33 @@ class QuotationService extends TransactionBaseService {
   //   })
   // }
   //
-  // /**
-  //  * Deletes a product from a given product id. The product's associated
-  //  * variants will also be deleted.
-  //  * @param productId - the id of the product to delete. Must be
-  //  *   castable as an ObjectId
-  //  * @return empty promise
-  //  */
-  // async delete(productId: string): Promise<void> {
-  //   return await this.atomicPhase_(async (manager) => {
-  //     const productRepo = manager.getCustomRepository(this.productRepository_)
-  //
-  //     // Should not fail, if product does not exist, since delete is idempotent
-  //     const product = await productRepo.findOne(
-  //       { id: productId },
-  //         // @ts-ignore
-  //       { relations: ["variants", "variants.prices", "variants.options"] }
-  //     )
-  //
-  //     if (!product) {
-  //       return
-  //     }
-  //
-  //     await productRepo.softRemove(product)
-  //
-  //     await this.eventBus_
-  //       .withTransaction(manager)
-  //       .emit(ProductService.Events.DELETED, {
-  //         id: productId,
-  //       })
-  //
-  //     return Promise.resolve()
-  //   })
-  // }
+  /**
+   * Deletes a product from a given product id. The product's associated
+   * variants will also be deleted.
+   * @param productId - the id of the product to delete. Must be
+   *   castable as an ObjectId
+   * @return empty promise
+   */
+  async delete(productId: string): Promise<void> {
+    return await this.atomicPhase_(async (manager) => {
+      const quotationRepo = manager.getCustomRepository(this.quotationRepository_)
+
+      // Should not fail, if product does not exist, since delete is idempotent
+      const quotation = await quotationRepo.findOne(
+        { id: productId },
+          // @ts-ignore
+        { relations: ["quotation_lines"] }
+      )
+
+      if (!quotation) {
+        return
+      }
+
+      await quotationRepo.softRemove(quotation)
+
+      return Promise.resolve()
+    })
+  }
   //
   // /**
   //  * Adds an option to a product. Options can, for example, be "Size", "Color",

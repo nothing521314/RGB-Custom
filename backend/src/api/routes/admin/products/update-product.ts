@@ -283,7 +283,7 @@ import { validator } from "../../../../utils/validator"
 export default async (req, res) => {
   const { id } = req.params
 
-  const validated = await validator(AdminPostProductsProductReq, req.body)
+  const validated = await validator(AdminPostProductsUpdateProductReq, req.body)
 
   const productService: ProductService = req.scope.resolve("productService")
   const pricingService: PricingService = req.scope.resolve("pricingService")
@@ -519,6 +519,130 @@ export class AdminPostProductsProductReq {
   @IsDate()
   @IsOptional()
   delivery_lead_time?: Date
+
+  @IsString()
+  @IsOptional()
+  warranty?: string
+
+  @IsObject()
+  @IsOptional()
+  metadata?: Record<string, unknown>
+}
+
+
+export class AdminPostProductsUpdateProductReq {
+  @IsString()
+  @IsOptional()
+  title?: string
+
+  @IsString()
+  @IsOptional()
+  subtitle?: string
+
+  @IsString()
+  @IsOptional()
+  description?: string
+
+  @IsBoolean()
+  @IsOptional()
+  discountable?: boolean
+
+  @IsArray()
+  @IsOptional()
+  images: string[]
+
+  @IsString()
+  @IsOptional()
+  thumbnail?: string
+
+  @IsString()
+  @IsOptional()
+  handle?: string
+
+  @IsEnum(ProductStatus)
+  @NotEquals(null)
+  @ValidateIf((object, value) => value !== undefined)
+  status?: ProductStatus
+
+  @IsOptional()
+  @Type(() => ProductTypeReq)
+  @ValidateNested()
+  type?: ProductTypeReq
+
+  @IsOptional()
+  @IsString()
+  collection_id?: string
+
+  @IsOptional()
+  @Type(() => ProductTagReq)
+  @ValidateNested({ each: true })
+  @IsArray()
+  tags?: ProductTagReq[]
+
+  @FeatureFlagDecorators(SalesChannelFeatureFlag.key, [
+    IsOptional(),
+    Type(() => ProductSalesChannelReq),
+    ValidateNested({ each: true }),
+    IsArray(),
+  ])
+  sales_channels: ProductSalesChannelReq[] | null
+
+  @IsOptional()
+  @Type(() => ProductVariantReq)
+  @ValidateNested({ each: true })
+  @IsArray()
+  variants?: ProductVariantReq[]
+
+  @IsNumber()
+  @IsOptional()
+  weight?: number
+
+  @IsNumber()
+  @IsOptional()
+  length?: number
+
+  @IsNumber()
+  @IsOptional()
+  height?: number
+
+  @IsNumber()
+  @IsOptional()
+  width?: number
+
+  @IsString()
+  @IsOptional()
+  hs_code?: string
+
+  @IsString()
+  @IsOptional()
+  origin_country?: string
+
+  @IsString()
+  @IsOptional()
+  mid_code?: string
+
+  @IsString()
+  @IsOptional()
+  material?: string
+
+  @Type(() => ProductPriceReq)
+  @ValidateNested({ each: true })
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsOptional()
+  prices: ProductPriceReq[]
+
+  @IsString()
+  @IsOptional()
+  brand?: string
+
+  @IsString()
+  @IsOptional()
+  dimension?: string
+
+  @IsString()
+  @IsOptional()
+  delivery_lead_time?: string
 
   @IsString()
   @IsOptional()

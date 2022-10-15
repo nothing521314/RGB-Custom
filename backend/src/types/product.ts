@@ -171,7 +171,41 @@ export type CreateProductInput = {
   additional_hardwares?: CreateProductAdditionalHardwareInput[] | null
   brand?: string
   dimension?: string
-  delivery_lead_time?: Date
+  delivery_lead_time?: string
+  warranty?: string
+  metadata?: Record<string, unknown>
+}
+
+
+export type UpdateProductInputBase = {
+  title: string
+  subtitle?: string
+  profile_id?: string
+  description?: string
+  is_giftcard?: boolean
+  discountable?: boolean
+  images?: string[]
+  thumbnail?: string
+  handle?: string
+  status?: ProductStatus
+  type?: CreateProductProductTypeInput
+  collection_id?: string
+  tags?: CreateProductProductTagInput[]
+  options?: CreateProductProductOption[]
+  variants?: CreateProductProductVariantInput[]
+  sales_channels?: CreateProductProductSalesChannelInput[] | null
+  weight?: number
+  length?: number
+  height?: number
+  width?: number
+  hs_code?: string
+  origin_country?: string
+  mid_code?: string
+  material?: string
+  prices?:CreateProductProductPricesInput[]
+  brand?: string
+  dimension?: string
+  delivery_lead_time?: string
   warranty?: string
   metadata?: Record<string, unknown>
 }
@@ -258,7 +292,7 @@ export type CreateProductProductVariantPriceInput = {
 }
 
 export type UpdateProductInput = Omit<
-  Partial<CreateProductInput>,
+  Partial<UpdateProductInputBase>,
   "variants"
 > & {
   variants?: UpdateProductProductVariantDTO[]

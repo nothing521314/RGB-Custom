@@ -76,6 +76,10 @@ export class AdminPostQuotationReq {
 
   @IsNotEmpty()
   @IsString()
+  header: string
+
+  @IsNotEmpty()
+  @IsString()
   condition: string
 
   @IsNotEmpty()

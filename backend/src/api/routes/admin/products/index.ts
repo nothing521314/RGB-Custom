@@ -11,6 +11,7 @@ import { AdminGetProductsParams } from "./list-products"
 const route = Router()
 
 export default (app, featureFlagRouter: FlagRouter) => {
+
   app.use("/products", route)
 
   if (featureFlagRouter.isFeatureEnabled("sales_channels")) {
@@ -32,6 +33,16 @@ export default (app, featureFlagRouter: FlagRouter) => {
   route.post(
     "/:id/metadata",
     middlewares.wrap(require("./set-metadata").default)
+  )
+
+  route.post(
+      "/:id/additional-hardware/:idHardware",
+      middlewares.wrap(require("./update-product-addtional").default)
+  )
+
+  route.delete(
+      "/:id/additional-hardware/:idHardware",
+      middlewares.wrap(require("./delete-product-addtional").default)
   )
 
   route.get(

@@ -45,8 +45,8 @@ export class Product extends SoftDeletableEntity {
   @Column({ type: "text", nullable: true })
   dimension: string | null
 
-  @Column({ type: "date", nullable: true })
-  delivery_lead_time: Date | null
+  @Column({ type: "text", nullable: true })
+  delivery_lead_time: string | null
 
   @Column({ type: "text", nullable: true })
   warranty: Date | null

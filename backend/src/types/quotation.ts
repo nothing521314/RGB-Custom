@@ -69,6 +69,7 @@ export type CreateQuotationInput = {
     customer_id: string
     region_id: string
     heading: string
+    header: string
     condition: string
     payment_term: string
     delivery_lead_time: string
