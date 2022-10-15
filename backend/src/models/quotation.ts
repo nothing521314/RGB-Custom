@@ -63,8 +63,8 @@ export class Quotation extends SoftDeletableEntity {
   @Column({ type: "text", nullable: true })
   payment_term: Date | null
 
-  @Column({ type: "date", nullable: true })
-  delivery_lead_time: Date | null
+  @Column({ type: "text", nullable: true })
+  delivery_lead_time: string
 
   @Column({ type: "text", nullable: true })
   warranty: string | null

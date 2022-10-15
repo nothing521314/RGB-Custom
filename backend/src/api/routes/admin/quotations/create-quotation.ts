@@ -83,9 +83,8 @@ export class AdminPostQuotationReq {
   payment_term: string
 
   @IsNotEmpty()
-  @IsDate()
-  @Type(() => Date)
-  delivery_lead_time: Date
+  @IsString()
+  delivery_lead_time: string
 
   @IsNotEmpty()
   @IsDate()
