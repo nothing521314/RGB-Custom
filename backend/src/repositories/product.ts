@@ -150,6 +150,7 @@ export class ProductRepository extends Repository<Product> {
           querybuilder.select(select.map((f) => `products.${f}`))
         }
 
+
         if (toplevel === "variants") {
           querybuilder = querybuilder
             .leftJoinAndSelect(

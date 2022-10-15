@@ -167,7 +167,6 @@ class ProductService extends TransactionBaseService {
         relations
       )
     }
-
     return await productRepo.findWithRelationsAndCount(relations, query)
   }
 

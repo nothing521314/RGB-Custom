@@ -113,7 +113,6 @@ class QuotationService extends TransactionBaseService {
         relations
       )
     }
-
     return await quotationRepo.findWithRelationsAndCount(relations, query)
   }
 
@@ -216,6 +215,8 @@ class QuotationService extends TransactionBaseService {
         if(quotation_lines?.length) {
           await Promise.all(quotation_lines.map(async (item) => {
             const newLine = new QuotationLine()
+            const childLine = []
+
             const price = await productPriceRepo.findOne({
               where: {
                 product_id: item.product_id,
@@ -228,8 +229,7 @@ class QuotationService extends TransactionBaseService {
             newLine.volume = item.volume
 
             if (item.child_product?.length) {
-              const childLine = []
-              item.child_product.map(async (i) => {
+              await Promise.all(item.child_product.map(async (i) => {
                 if (item.product_id !== i.product_id) {
                   const newChildLine = new QuotationLine()
                   const price = await productPriceRepo.findOne({
@@ -246,19 +246,21 @@ class QuotationService extends TransactionBaseService {
 
                   childLine.push(newChildLine)
                 }
-              })
+              }))
               newLine.child_product = childLine
             }
             quotationLines.push(newLine)
           }))
-
         }
+
+        console.log(quotationLines)
+
         let quotation = quotationRepo.create({...rest, quotation_lines: quotationLines})
         quotation = await quotationRepo.save(quotation)
 
 
         const result = await this.retrieve(quotation.id, {
-          relations: ["customer", "user", "quotation_line"],
+          // relations: ["customer", "user", "quotation_line"],
         })
         return result
       } catch (error) {

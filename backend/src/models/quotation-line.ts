@@ -4,18 +4,12 @@ import {
   Entity,
   Index,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
 } from "typeorm"
 
 import { SoftDeletableEntity } from "../interfaces/models/soft-deletable-entity"
 import { generateEntityId } from "../utils/generate-entity-id"
-import {User} from "./user";
-import {Customer} from "./customer";
-import {Region} from "./region";
-import {ProductPrice} from "./product-price";
 import {Product} from "./product";
 import {Quotation} from "./quotation";
 
@@ -33,7 +27,7 @@ export class QuotationLine extends SoftDeletableEntity {
   @Column({nullable: true})
   quotation_id: string
 
-  @ManyToOne(() => Quotation)
+  @ManyToOne(() => Quotation, quotation => quotation.quotation_lines)
   @JoinColumn({ name: "quotation_id" })
   quotation: Quotation
 
@@ -43,14 +37,14 @@ export class QuotationLine extends SoftDeletableEntity {
   @Column({ type: "int", nullable: false })
   unit_price: number
 
-  @OneToMany(() => QuotationLine, (i) => i.parent_product_id,{ cascade: true, eager: true, nullable: true})
+  @OneToMany(() => QuotationLine, (i) => i.parent_product, { cascade: true, nullable: true})
   child_product: QuotationLine[]
 
   @Index()
   @Column({nullable: true})
   parent_product_id: string
 
-  @ManyToOne(() => QuotationLine, {cascade: true, eager: true, nullable: true})
+  @ManyToOne(() => QuotationLine)
   @JoinColumn({ name: "parent_product_id" })
   parent_product: QuotationLine
 

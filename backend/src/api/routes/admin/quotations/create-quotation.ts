@@ -39,6 +39,8 @@ export default async (req, res) => {
     return quotation
   })
 
+  console.log(newQuotation)
+
   const quotation = await quotationService.retrieve(newQuotation.id, {
     select: defaultAdminQuotationFields,
     relations: defaultAdminQuotationRelations,

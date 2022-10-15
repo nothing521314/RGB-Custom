@@ -117,6 +117,11 @@ export class QoutationRepository extends Repository<Quotation> {
                     querybuilder.select(select.map((f) => `quotations.${f}`))
                 }
 
+                querybuilder = querybuilder.leftJoinAndSelect(
+                    `quotations.${toplevel}`,
+                    toplevel
+                )
+
                 for (const rel of rels) {
                     const [_, rest] = rel.split(".")
                     if (!rest) {

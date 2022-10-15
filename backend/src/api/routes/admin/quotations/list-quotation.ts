@@ -204,7 +204,7 @@ import {FilterableQuotationProps} from "../../../../types/quotation";
 export default async (req, res) => {
   const quotationService: QuotationService = req.scope.resolve("quotationService")
 
-  const { skip, take, relations } = req.listConfig
+  const { skip, take } = req.listConfig
 
   const [quotations, count] = await quotationService.listAndCount(
     req.filterableFields,
@@ -212,7 +212,7 @@ export default async (req, res) => {
   )
 
   res.json({
-      quotations,
+    quotations,
     count,
     offset: skip,
     limit: take,

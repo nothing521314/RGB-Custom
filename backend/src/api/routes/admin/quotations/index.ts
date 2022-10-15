@@ -63,19 +63,16 @@ export default (app, featureFlagRouter: FlagRouter) => {
 
 export const defaultAdminQuotationRelations = [
   "customer",
-  "user",
+  "sale_persion",
   "region",
-  "quotation_lines"
+  "quotation_lines",
+  "quotation_lines.child_product"
 ]
 
 export const defaultAdminQuotationFields: (keyof Quotation)[] = [
   "id",
-  "sale_persion",
   "code",
   "date",
-  "customer",
-  "region_id",
-  "quotation_lines",
   "heading",
   "condition",
   "payment_term",
@@ -88,8 +85,6 @@ export const defaultAdminQuotationFields: (keyof Quotation)[] = [
   "updated_at",
   "deleted_at",
 ]
-
-export const defaultAdminGetProductsVariantsFields = ["id", "product_id"]
 
 export const allowedAdminQuotationFields = [
   "id",
@@ -98,7 +93,6 @@ export const allowedAdminQuotationFields = [
   "date",
   "customer_id",
   "region_id",
-  "quotation_lines",
   "heading",
   "condition",
   "payment_term",
@@ -111,40 +105,6 @@ export const allowedAdminQuotationFields = [
   "updated_at",
   "deleted_at",
 ]
-
-export const allowedAdminProductRelations = [
-  "variants",
-  "variants.prices",
-  "images",
-  "options",
-  "tags",
-  "type",
-  "collection",
-  "sales_channels",
-]
-
-export type AdminProductsDeleteOptionRes = {
-  option_id: string
-  object: "option"
-  deleted: boolean
-  product: Product
-}
-
-export type AdminOuotationListRes = PaginatedResponse & {
-  products: (PricedProduct | Product)[]
-}
-
-export type AdminProductsListTypesRes = {
-  types: ProductType[]
-}
-
-export type AdminProductsListTagsRes = {
-  tags: ProductTag[]
-}
-
-export type AdminProductsRes = {
-  product: Product
-}
 
 export * from "./create-quotation"
 // export * from "./delete-quotation"
