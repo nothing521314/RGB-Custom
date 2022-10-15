@@ -12,14 +12,14 @@
 //   ValidateIf,
 //   ValidateNested,
 // } from "class-validator"
-// import { PricingService, ProductService } from "../../../../services"
+// import {PricingService, ProductService, QuotationService} from "../../../../services"
 // import {
 //   ProductAdditionalHardwareReq, ProductPriceReq,
 //   ProductSalesChannelReq,
 //   ProductTagReq,
 //   ProductTypeReq,
 // } from "../../../../types/product"
-// import { defaultAdminQuotationFields, defaultAdminQuotationRelations } from "."
+// import {AdminPostQuotationReq, defaultAdminQuotationFields, defaultAdminQuotationRelations} from "."
 //
 // import { EntityManager } from "typeorm"
 // import { FeatureFlagDecorators } from "../../../../utils/feature-flag-decorators"
@@ -28,6 +28,7 @@
 // import SalesChannelFeatureFlag from "../../../../loaders/feature-flags/sales-channels"
 // import { Type } from "class-transformer"
 // import { validator } from "../../../../utils/validator"
+// import {QoutationRepository} from "../../../../repositories/quotation";
 //
 // /**
 //  * @oas [post] /products/{id}
@@ -283,26 +284,23 @@
 // export default async (req, res) => {
 //   const { id } = req.params
 //
-//   const validated = await validator(AdminPostProductsProductReq, req.body)
+//   const validated = await validator(AdminPostQuotationReqReq, req.body)
 //
-//   const productService: ProductService = req.scope.resolve("productService")
-//   const pricingService: PricingService = req.scope.resolve("pricingService")
+//   const quotationService: QuotationService = req.scope.resolve("quotationService")
 //
 //   const manager: EntityManager = req.scope.resolve("manager")
 //   await manager.transaction(async (transactionManager) => {
-//     await productService
+//     await quotationService
 //       .withTransaction(transactionManager)
 //       .update(id, validated)
 //   })
 //
-//   const rawProduct = await productService.retrieve(id, {
+//   const quotation = await quotationService.retrieve(id, {
 //     select: defaultAdminQuotationFields,
 //     relations: defaultAdminQuotationRelations,
 //   })
 //
-//   const [product] = await pricingService.setProductPrices([rawProduct])
-//
-//   res.json({ product })
+//   res.json({ quotation })
 // }
 //
 // class ProductVariantOptionReq {

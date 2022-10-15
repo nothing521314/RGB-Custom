@@ -52,8 +52,15 @@ import UserService from "../../../../services/user"
  *     $ref: "#/components/responses/500_error"
  */
 export default async (req, res) => {
+  const {q, ...rest} = req.query
   const userService: UserService = req.scope.resolve("userService")
-  const users = await userService.list({})
+
+  let users
+
+  if(q)
+    users = await userService.filter(q)
+  else
+    users = await userService.list({})
 
   res.status(200).json({ users })
 }

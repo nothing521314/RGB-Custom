@@ -71,7 +71,7 @@ export type CreateQuotationInput = {
     heading: string
     condition: string
     payment_term: string
-    delivery_lead_time: Date
+    delivery_lead_time: string
     install_support: string
     appendix_a: string
     appendix_b: string
