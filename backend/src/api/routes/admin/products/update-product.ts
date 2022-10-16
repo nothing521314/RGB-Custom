@@ -632,6 +632,13 @@ export class AdminPostProductsUpdateProductReq {
   @IsOptional()
   prices: ProductPriceReq[]
 
+  @IsOptional()
+  @Type(() => ProductAdditionalHardwareReq)
+  @ValidateNested({ each: true })
+  @IsArray()
+  additional_hardwares?: ProductAdditionalHardwareReq[]
+
+
   @IsString()
   @IsOptional()
   brand?: string

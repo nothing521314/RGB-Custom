@@ -203,6 +203,7 @@ export type UpdateProductInputBase = {
   mid_code?: string
   material?: string
   prices?:CreateProductProductPricesInput[]
+  additional_hardwares?:CreateProductAdditionalHardwareInput[]
   brand?: string
   dimension?: string
   delivery_lead_time?: string

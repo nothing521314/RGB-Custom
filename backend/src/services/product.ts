@@ -189,7 +189,10 @@ class ProductService extends TransactionBaseService {
         const manager = this.manager_
 
         const res = await manager.query("select brand from product group by brand")
-        const branch = await manager.query(`select brand from product group by brand limit ${config.take} offset ${config.skip} `)
+        const branch = await manager.query(`select brand
+                                            from product
+                                            group by brand limit ${config.take}
+                                            offset ${config.skip} `)
 
 
         return [branch, res.length]
@@ -387,7 +390,7 @@ class ProductService extends TransactionBaseService {
         return await productTagRepo.listTagsByUsage(count)
     }
 
-    async createHardware(product: string, hardware: string){
+    async createHardware(product: string, hardware: string) {
         return await this.atomicPhase_(async (manager) => {
             const productAddRepo = manager.getCustomRepository(this.productAdditionalRepository_)
 
@@ -398,7 +401,7 @@ class ProductService extends TransactionBaseService {
                 }
             })
 
-            if(!add){
+            if (!add) {
                 const additional = new ProductAdditionalHardware()
                 additional.product_parent_id = product
                 additional.product_additions_id = hardware
@@ -407,7 +410,7 @@ class ProductService extends TransactionBaseService {
         })
     }
 
-    async deleteHardware(product: string, hardware: string){
+    async deleteHardware(product: string, hardware: string) {
         return await this.atomicPhase_(async (manager) => {
             const productAddRepo = manager.getCustomRepository(this.productAdditionalRepository_)
 
@@ -418,11 +421,12 @@ class ProductService extends TransactionBaseService {
                 }
             })
 
-            if(add){
+            if (add) {
                 await productAddRepo.delete(add.id)
             }
         })
     }
+
     /**
      * Creates a product.
      * @param productObject - the product to create
@@ -578,6 +582,9 @@ class ProductService extends TransactionBaseService {
             const productTypeRepo = manager.getCustomRepository(
                 this.productTypeRepository_
             )
+            const productAddRepo = manager.getCustomRepository(
+                this.productAdditionalRepository_
+            )
             const imageRepo = manager.getCustomRepository(this.imageRepository_)
 
             const relations = ["variants", "tags", "images"]
@@ -608,6 +615,7 @@ class ProductService extends TransactionBaseService {
                 tags,
                 type,
                 prices,
+                additional_hardwares,
                 sales_channels: salesChannels,
                 ...rest
             } = update
@@ -615,6 +623,27 @@ class ProductService extends TransactionBaseService {
 
             if (!product.thumbnail && !update.thumbnail && images?.length) {
                 product.thumbnail = images[0]
+            }
+
+            if (additional_hardwares) {
+                const oldAdd = await productRepo.findOne(productId)
+
+                await Promise.all(oldAdd.additional_hardwares.map(async item => {
+                    const index = additional_hardwares.findIndex(el => el.id == item.product_additions_id)
+
+                    if (index < 0) await productAddRepo.delete(item.id)
+                }))
+
+                await Promise.all(additional_hardwares.map(async item => {
+                    const index = oldAdd.additional_hardwares.findIndex(el => el.product_additions_id == item.id)
+                    console.log(index)
+                    if (index < 0) {
+                        const hw = new ProductAdditionalHardware()
+                        hw.product_additions_id = item.id
+                        hw.product_parent_id = productId
+                        await productAddRepo.save(hw)
+                    }
+                }))
             }
 
             if (prices) {
@@ -626,15 +655,14 @@ class ProductService extends TransactionBaseService {
                         }
                     })
 
-                    if(productPrice){
-                        if(item.value > 0)
+                    if (productPrice) {
+                        if (item.value > 0)
                             await productPriceRepo.update(productPrice.id, {
                                 price: item.value
                             })
                         else
                             await productPriceRepo.delete(productPrice.id)
-                    }
-                    else {
+                    } else {
                         productPriceRepo.create({
                             product_id: productId,
                             region_id: item.region,
@@ -648,9 +676,6 @@ class ProductService extends TransactionBaseService {
                 product.images = await imageRepo.upsertImages(images)
             }
 
-            if (prices) {
-
-            }
 
             if (metadata) {
                 product.metadata = setMetadata(product, metadata)
