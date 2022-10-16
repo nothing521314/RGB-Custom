@@ -89,7 +89,9 @@ export const defaultAdminProductRelations = [
     "type",
     "collection",
     "prices",
-    "additional_hardwares"
+    "additional_hardwares",
+    "additional_hardwares.product_addition",
+    "additional_hardwares.product_addition.prices"
 ]
 
 export const defaultAdminProductFields: (keyof Product)[] = [
