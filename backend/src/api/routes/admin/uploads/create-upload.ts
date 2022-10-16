@@ -72,16 +72,13 @@ export default async (req, res) => {
   try {
     const fileService = req.scope.resolve("fileService")
 
-    const result = await Promise.all(
-      req.files.map(async (f) => {
-        return fileService.upload(f).then((result) => {
-          fs.unlinkSync(f.path)
-          return result
-        })
-      })
-    )
+    const images = []
 
-    res.status(200).json({ uploads: result })
+    req.files.map(item => {
+      images.push('/img/' + item.filename)
+    })
+
+    res.status(200).json({ uploads: images })
   } catch (err) {
     console.log(err)
     throw err

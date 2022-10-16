@@ -178,6 +178,23 @@ class ProductService extends TransactionBaseService {
         return await productRepo.findWithRelationsAndCount(relations, query)
     }
 
+
+    async listBrandAndCount(
+        config: FindProductConfig = {
+            relations: [],
+            skip: 0,
+            take: 20,
+        }
+    ): Promise<[Product[], number]> {
+        const manager = this.manager_
+
+        const res = await manager.query("select brand from product group by brand")
+        const branch = await manager.query(`select brand from product group by brand limit ${config.take} offset ${config.skip} `)
+
+
+        return [branch, res.length]
+    }
+
     async listAndCountAdditional(
         selector: FilterableProductProps | Selector<Product>,
         config: FindProductConfig = {

@@ -1,191 +1,200 @@
-import { Router } from "express"
+import {Router} from "express"
 import "reflect-metadata"
-import { Product, ProductTag, ProductType } from "../../../.."
-import { EmptyQueryParams, PaginatedResponse } from "../../../../types/common"
-import { PricedProduct } from "../../../../types/pricing"
-import { FlagRouter } from "../../../../utils/flag-router"
-import middlewares, { transformQuery } from "../../../middlewares"
-import { validateSalesChannelsExist } from "../../../middlewares/validators/sales-channel-existence"
-import { AdminGetProductsParams } from "./list-products"
+import {Product, ProductTag, ProductType} from "../../../.."
+import {EmptyQueryParams, PaginatedResponse} from "../../../../types/common"
+import {PricedProduct} from "../../../../types/pricing"
+import {FlagRouter} from "../../../../utils/flag-router"
+import middlewares, {transformQuery} from "../../../middlewares"
+import {validateSalesChannelsExist} from "../../../middlewares/validators/sales-channel-existence"
+import {AdminGetProductsParams} from "./list-products"
 
 const route = Router()
+const route2 = Router()
 
 export default (app, featureFlagRouter: FlagRouter) => {
 
-  app.use("/products", route)
+    app.use("/products", route)
+    app.use("/brands", route2)
 
-  if (featureFlagRouter.isFeatureEnabled("sales_channels")) {
-    defaultAdminProductRelations.push("sales_channels")
-  }
+    route2.get("/", transformQuery(AdminGetProductsParams, {
+        defaultRelations: defaultAdminProductRelations,
+        defaultFields: defaultAdminProductFields,
+        allowedFields: allowedAdminProductFields,
+        isList: false,
+    }), middlewares.wrap(require("./list-brand").default))
 
-  route.post(
-    "/",
-    validateSalesChannelsExist((req) => req.body?.sales_channels),
-    middlewares.wrap(require("./create-product").default)
-  )
+    if (featureFlagRouter.isFeatureEnabled("sales_channels")) {
+        defaultAdminProductRelations.push("sales_channels")
+    }
 
-  route.post(
-    "/:id",
-    validateSalesChannelsExist((req) => req.body?.sales_channels),
-    middlewares.wrap(require("./update-product").default)
-  )
+    route.post(
+        "/",
+        validateSalesChannelsExist((req) => req.body?.sales_channels),
+        middlewares.wrap(require("./create-product").default)
+    )
 
-  route.post(
-    "/:id/metadata",
-    middlewares.wrap(require("./set-metadata").default)
-  )
+    route.post(
+        "/:id",
+        validateSalesChannelsExist((req) => req.body?.sales_channels),
+        middlewares.wrap(require("./update-product").default)
+    )
 
-  route.post(
-      "/:id/additional-hardware/:idHardware",
-      middlewares.wrap(require("./update-product-addtional").default)
-  )
+    route.post(
+        "/:id/metadata",
+        middlewares.wrap(require("./set-metadata").default)
+    )
 
-  route.delete(
-      "/:id/additional-hardware/:idHardware",
-      middlewares.wrap(require("./delete-product-addtional").default)
-  )
+    route.post(
+        "/:id/additional-hardware/:idHardware",
+        middlewares.wrap(require("./update-product-addtional").default)
+    )
 
-  route.get(
-    "/:id",
-    transformQuery(EmptyQueryParams, {
-      defaultRelations: defaultAdminProductRelations,
-      defaultFields: defaultAdminProductFields,
-      allowedFields: allowedAdminProductFields,
-      isList: false,
-    }),
-    middlewares.wrap(require("./get-product").default)
-  )
+    route.delete(
+        "/:id/additional-hardware/:idHardware",
+        middlewares.wrap(require("./delete-product-addtional").default)
+    )
 
-  route.get(
-    "/",
-    transformQuery(AdminGetProductsParams, {
-      defaultRelations: defaultAdminProductRelations,
-      defaultFields: defaultAdminProductFields,
-      allowedFields: allowedAdminProductFields,
-      isList: true,
-    }),
-    middlewares.wrap(require("./list-products").default)
-  )
+    route.get(
+        "/:id",
+        transformQuery(EmptyQueryParams, {
+            defaultRelations: defaultAdminProductRelations,
+            defaultFields: defaultAdminProductFields,
+            allowedFields: allowedAdminProductFields,
+            isList: false,
+        }),
+        middlewares.wrap(require("./get-product").default)
+    )
 
-  return app
+    route.get(
+        "/",
+        transformQuery(AdminGetProductsParams, {
+            defaultRelations: defaultAdminProductRelations,
+            defaultFields: defaultAdminProductFields,
+            allowedFields: allowedAdminProductFields,
+            isList: true,
+        }),
+        middlewares.wrap(require("./list-products").default)
+    )
+
+    return app
 }
 
 export const defaultAdminProductRelations = [
-  "variants",
-  "variants.prices",
-  "variants.options",
-  "images",
-  "options",
-  "tags",
-  "type",
-  "collection",
-  "prices",
-  "additional_hardwares"
+    "variants",
+    "variants.prices",
+    "variants.options",
+    "images",
+    "options",
+    "tags",
+    "type",
+    "collection",
+    "prices",
+    "additional_hardwares"
 ]
 
 export const defaultAdminProductFields: (keyof Product)[] = [
-  "id",
-  "title",
-  "subtitle",
-  "status",
-  "external_id",
-  "description",
-  "handle",
-  "is_giftcard",
-  "discountable",
-  "thumbnail",
-  "profile_id",
-  "collection_id",
-  "type_id",
-  "weight",
-  "length",
-  "height",
-  "width",
-  "hs_code",
-  "origin_country",
-  "mid_code",
-  "material",
-  "created_at",
-  "updated_at",
-  "deleted_at",
-  "metadata",
+    "id",
+    "title",
+    "subtitle",
+    "status",
+    "external_id",
+    "description",
+    "handle",
+    "is_giftcard",
+    "discountable",
+    "thumbnail",
+    "profile_id",
+    "collection_id",
+    "type_id",
+    "weight",
+    "length",
+    "height",
+    "width",
+    "hs_code",
+    "origin_country",
+    "mid_code",
+    "material",
+    "created_at",
+    "updated_at",
+    "deleted_at",
+    "metadata",
 ]
 
 export const defaultAdminGetProductsVariantsFields = ["id", "product_id"]
 
 export const allowedAdminProductFields = [
-  "id",
-  "title",
-  "subtitle",
-  "status",
-  "external_id",
-  "description",
-  "handle",
-  "is_giftcard",
-  "discountable",
-  "thumbnail",
-  "profile_id",
-  "collection_id",
-  "type_id",
-  "weight",
-  "length",
-  "height",
-  "width",
-  "hs_code",
-  "origin_country",
-  "mid_code",
-  "material",
-  "created_at",
-  "updated_at",
-  "deleted_at",
-  "metadata",
+    "id",
+    "title",
+    "subtitle",
+    "status",
+    "external_id",
+    "description",
+    "handle",
+    "is_giftcard",
+    "discountable",
+    "thumbnail",
+    "profile_id",
+    "collection_id",
+    "type_id",
+    "weight",
+    "length",
+    "height",
+    "width",
+    "hs_code",
+    "origin_country",
+    "mid_code",
+    "material",
+    "created_at",
+    "updated_at",
+    "deleted_at",
+    "metadata",
 ]
 
 export const allowedAdminProductRelations = [
-  "variants",
-  "variants.prices",
-  "images",
-  "options",
-  "tags",
-  "type",
-  "collection",
-  "sales_channels",
+    "variants",
+    "variants.prices",
+    "images",
+    "options",
+    "tags",
+    "type",
+    "collection",
+    "sales_channels",
 ]
 
 export type AdminProductsDeleteOptionRes = {
-  option_id: string
-  object: "option"
-  deleted: boolean
-  product: Product
+    option_id: string
+    object: "option"
+    deleted: boolean
+    product: Product
 }
 
 export type AdminProductsDeleteVariantRes = {
-  variant_id: string
-  object: "product-variant"
-  deleted: boolean
-  product: Product
+    variant_id: string
+    object: "product-variant"
+    deleted: boolean
+    product: Product
 }
 
 export type AdminProductsDeleteRes = {
-  id: string
-  object: "product"
-  deleted: boolean
+    id: string
+    object: "product"
+    deleted: boolean
 }
 
 export type AdminProductsListRes = PaginatedResponse & {
-  products: (PricedProduct | Product)[]
+    products: (PricedProduct | Product)[]
 }
 
 export type AdminProductsListTypesRes = {
-  types: ProductType[]
+    types: ProductType[]
 }
 
 export type AdminProductsListTagsRes = {
-  tags: ProductTag[]
+    tags: ProductTag[]
 }
 
 export type AdminProductsRes = {
-  product: Product
+    product: Product
 }
 
 export * from "./add-option"

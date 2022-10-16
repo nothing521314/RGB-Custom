@@ -1,10 +1,11 @@
-import { Express } from 'express'
+import express, { Express } from 'express'
 import session from "express-session"
 import cookieParser from "cookie-parser"
 import morgan from "morgan"
 import redis, { RedisConfig } from "redis"
 import createStore from "connect-redis"
 import { ConfigModule } from "../types/global"
+import path from "path";
 
 type Options = {
   app: Express;
@@ -51,6 +52,11 @@ export default async ({ app, configModule }: Options): Promise<Express> => {
   )
   app.use(cookieParser())
   app.use(session(sessionOpts))
+
+
+  console.log(path.join(__dirname + '../../../public'))
+
+  app.use(express.static(path.join(__dirname + '../../../public')))
 
   app.get("/health", (req, res) => {
     res.status(200).send("OK")
