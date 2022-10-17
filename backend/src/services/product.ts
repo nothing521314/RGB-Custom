@@ -179,7 +179,7 @@ class ProductService extends TransactionBaseService {
     }
 
 
-    async listBrandAndCount(
+    async listBrandAndCount(q = undefined,
         config: FindProductConfig = {
             relations: [],
             skip: 0,
@@ -187,12 +187,26 @@ class ProductService extends TransactionBaseService {
         }
     ): Promise<[Product[], number]> {
         const manager = this.manager_
+        let res, branch
 
-        const res = await manager.query("select brand from product group by brand")
-        const branch = await manager.query(`select brand
+        if(q != undefined){
+         //TODO: FIX MEEEE
+         res = await manager.query(`select brand from product group by brand having brand like '%${q}%'`)
+             branch = await manager.query(`select brand
                                             from product
-                                            group by brand limit ${config.take}
+                                            group by brand
+                                            having "brand" like '%${q}%'
+                                            limit ${config.take}
                                             offset ${config.skip} `)
+        } else {
+             res = await manager.query(`select brand from product group by brand`)
+             branch = await manager.query(`select brand
+                                            from product
+                                            group by brand
+                                            limit ${config.take}
+                                            offset ${config.skip} `)
+        }
+
 
 
         return [branch, res.length]
@@ -636,7 +650,6 @@ class ProductService extends TransactionBaseService {
 
                 await Promise.all(additional_hardwares.map(async item => {
                     const index = oldAdd.additional_hardwares.findIndex(el => el.product_additions_id == item.id)
-                    console.log(index)
                     if (index < 0) {
                         const hw = new ProductAdditionalHardware()
                         hw.product_additions_id = item.id
@@ -663,11 +676,13 @@ class ProductService extends TransactionBaseService {
                         else
                             await productPriceRepo.delete(productPrice.id)
                     } else {
-                        productPriceRepo.create({
+                        const newPrice = await productPriceRepo.create({
                             product_id: productId,
                             region_id: item.region,
                             price: item.value,
                         })
+
+                        await productPriceRepo.save(newPrice)
                     }
                 }))
             }
@@ -782,6 +797,7 @@ class ProductService extends TransactionBaseService {
     async delete(productId: string): Promise<void> {
         return await this.atomicPhase_(async (manager) => {
             const productRepo = manager.getCustomRepository(this.productRepository_)
+            const productHWRepo = manager.getCustomRepository(this.productAdditionalRepository_)
 
             // Should not fail, if product does not exist, since delete is idempotent
             const product = await productRepo.findOne(
@@ -795,6 +811,10 @@ class ProductService extends TransactionBaseService {
             }
 
             await productRepo.softRemove(product)
+
+            await productHWRepo.delete({
+                product_additions_id: product.id
+            })
 
             await this.eventBus_
                 .withTransaction(manager)

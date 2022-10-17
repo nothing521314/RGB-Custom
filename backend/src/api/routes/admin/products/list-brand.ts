@@ -7,9 +7,9 @@ import { Type } from "class-transformer"
 export default async (req, res) => {
   const productService: ProductService = req.scope.resolve("productService")
 
+  const { q } = req.query
 
-
-  const [products, count] = await productService.listBrandAndCount()
+  const [products, count] = await productService.listBrandAndCount(q)
 
   res.json({
     products,

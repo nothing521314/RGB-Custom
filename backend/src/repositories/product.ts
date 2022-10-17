@@ -195,6 +195,8 @@ export class ProductRepository extends Repository<Product> {
           )
         }
 
+        querybuilder.orderBy('products.updated_at', 'DESC')
+
         return querybuilder.getMany()
       })
     ).then(flatten)
@@ -212,6 +214,7 @@ export class ProductRepository extends Repository<Product> {
       // @ts-ignore
       entities = await this.findByIds(idsOrOptionsWithoutRelations, {
         withDeleted: idsOrOptionsWithoutRelations.withDeleted ?? false,
+        order: ['updated_at', 'DESC']
       })
       count = entities.length
     } else {
@@ -222,6 +225,7 @@ export class ProductRepository extends Repository<Product> {
       entities = result[0]
       count = result[1]
     }
+
     const entitiesIds = entities.map(({ id }) => id)
 
     if (entitiesIds.length === 0) {
@@ -365,6 +369,7 @@ export class ProductRepository extends Repository<Product> {
       )
       .skip(cleanedOptions.skip)
       .take(cleanedOptions.take)
+        .orderBy('product.updated_at', 'DESC')
 
     if (cleanedOptions.withDeleted) {
       qb = qb.withDeleted()

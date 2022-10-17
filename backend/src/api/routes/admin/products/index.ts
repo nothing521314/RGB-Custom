@@ -54,6 +54,11 @@ export default (app, featureFlagRouter: FlagRouter) => {
         middlewares.wrap(require("./delete-product-addtional").default)
     )
 
+    route.delete(
+        "/:id",
+        middlewares.wrap(require("./delete-product").default)
+    )
+
     route.get(
         "/:id",
         transformQuery(EmptyQueryParams, {

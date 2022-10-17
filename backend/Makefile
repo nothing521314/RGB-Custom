@@ -12,4 +12,5 @@ deploy:
 				--exclude dist \
 				--exclude package-lock.json \
 				--exclude node_modules \
+				--exclude public \
 				. gameroot@103.170.207.189:~/RGB/backend
