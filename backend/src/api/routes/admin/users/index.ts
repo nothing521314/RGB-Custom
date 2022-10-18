@@ -6,9 +6,17 @@ import middlewares from "../../../middlewares"
 export const unauthenticatedUserRoutes = (app) => {
   const route = Router()
   app.use("/users", route)
+
+  const route2 = Router()
+  app.use("/users-auth", route2)
 }
 
 export default (app) => {
+  const route2 = Router()
+  app.use("/users-auth", route2)
+  route2.post("/",(req, res, next) => {console.log("oke"), console.log(req), next()} , middlewares.wrap(require("./reset-password-token").default))
+  // route2.post("/change-password", middlewares.wrap(require("./rest-password").default))
+
   const route = Router()
   app.use("/users", route)
 
@@ -36,7 +44,6 @@ export type AdminDeleteUserRes = DeleteResponse
 
 export * from "./reset-password"
 export * from "./reset-password-token"
-
 export * from "./create-user"
 export * from "./delete-user"
 export * from "./get-user"

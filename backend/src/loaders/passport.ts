@@ -50,6 +50,9 @@ export default async ({ app, container, configModule }: { app: Express; containe
   passport.use(
     new BearerStrategy(async (token, done) => {
       const auth = await authService.authenticateAPIToken(token)
+
+        console.log(auth)
+
       if (auth.success) {
         done(null, auth.user)
       } else {

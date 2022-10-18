@@ -59,6 +59,7 @@ class AuthService extends TransactionBaseService {
           const user: User = await this.userService_
             .withTransaction(transactionManager)
             .retrieve(token)
+          console.log(user)
           return {
             success: true,
             user,

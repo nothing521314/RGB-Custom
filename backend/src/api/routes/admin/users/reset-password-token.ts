@@ -69,16 +69,20 @@ import { EntityManager } from "typeorm"
 export default async (req, res) => {
   const validated = await validator(AdminResetPasswordTokenRequest, req.body)
 
+  // console.log(req)
+
   const userService: UserService = req.scope.resolve("userService")
   const user = await userService.retrieveByEmail(validated.email)
 
   // Should call a email service provider that sends the token to the user
   const manager: EntityManager = req.scope.resolve("manager")
-  await manager.transaction(async (transactionManager) => {
+  const token = await manager.transaction(async (transactionManager) => {
     return await userService
       .withTransaction(transactionManager)
       .generateResetPasswordToken(user.id)
   })
+
+  console.log("token")
 
   res.sendStatus(204)
 }

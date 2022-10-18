@@ -134,6 +134,7 @@ export type payload = {
   user_id: string
   password: string
 }
+
 export class AdminResetPasswordRequest {
   @IsEmail()
   @IsOptional()
