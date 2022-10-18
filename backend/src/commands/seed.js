@@ -60,14 +60,20 @@ const t = async function ({ directory, migrate, seedFile }) {
 
   const manager = container.resolve("manager")
 
+
+  const storeService = container.resolve("storeService")
   const userService = container.resolve("userService")
   const regionService = container.resolve("regionService")
   const collectionService = container.resolve("productCollectionService")
 
   await manager.transaction(async (tx) => {
-    const { users, regions, productCollections } = JSON.parse(
+    const { store, users, regions, productCollections } = JSON.parse(
       fs.readFileSync(resolvedPath, `utf-8`)
     )
+
+    if (store) {
+      await storeService.withTransaction(tx).update(store)
+    }
 
     for (const u of users) {
       const pass = u.password

@@ -1,35 +1,41 @@
 {
   "store": {
-    "currencies": ["eur", "usd"]
+    "currencies": ["eur", "usd", "vnd"]
   },
   "users": [
     {
       "email": "admin@admin.com",
-      "password": "admin"
+      "password": "admin",
+      "role": "admin"
+    },
+    {
+      "email": "sale.man@admin.com",
+      "password": "saleman",
+      "role": "admin"
     }
   ],
   "productCollections": [
     {
-      "title": "Slot Machine"
+      "title": "Machines - QM"
     },
     {
-      "title": "Electronic Table Games (ETG)"
+      "title": "System - QS"
     },
     {
-      "title": "Spare Parts"
+      "title": "Spare Parts - QP"
     },
     {
-      "title": "Casino Management System (CMS)"
+      "title": "Casino Products - QC"
     },
     {
-      "title": "Other"
+      "title": "Other - QO"
     }
   ],
   "regions": [
     {
       "id": "region-vietname",
       "name": "Viet Nam",
-      "currency_code": "usd",
+      "currency_code": "vnd",
       "tax_rate": 0,
       "payment_providers": [],
       "fulfillment_providers": [],

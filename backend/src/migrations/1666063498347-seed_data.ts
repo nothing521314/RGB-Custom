@@ -2,8 +2,8 @@ import {MigrationInterface, QueryRunner} from "typeorm";
 import {countries} from "../utils/countries";
 import {currencies} from "../utils/currencies";
 
-export class countriesCurrencies1665754797321 implements MigrationInterface {
-
+export class seedData1666063498347 implements MigrationInterface {
+    name = 'seedData1666063498347'
     public async up(queryRunner: QueryRunner): Promise<void> {
         for (const c of countries) {
             const query = `INSERT INTO "country" ("iso_2", "iso_3", "num_code", "name", "display_name") VALUES ($1, $2, $3, $4, $5)`

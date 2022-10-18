@@ -224,32 +224,35 @@ class QuotationService extends TransactionBaseService {
               }
             })
 
-            newLine.unit_price = price.price
-            newLine.product_id = item.product_id
-            newLine.volume = item.volume
+            if(price){
+              newLine.unit_price = price.price
+              newLine.product_id = item.product_id
+              newLine.volume = item.volume
 
-            if (item.child_product?.length) {
-              await Promise.all(item.child_product.map(async (i) => {
-                if (item.product_id !== i.product_id) {
-                  const newChildLine = new QuotationLine()
-                  const price = await productPriceRepo.findOne({
-                    where: {
-                      product_id: i.product_id,
-                      region_id: createQuotationObject.region_id
+              if (item.child_product?.length) {
+                await Promise.all(item.child_product.map(async (i) => {
+                  if (item.product_id !== i.product_id) {
+                    const newChildLine = new QuotationLine()
+                    const price = await productPriceRepo.findOne({
+                      where: {
+                        product_id: i.product_id,
+                        region_id: createQuotationObject.region_id
+                      }
+                    })
+                    if(price) {
+                      newLine.unit_price = price.price
+                      newChildLine.volume = i.volume
+                      newChildLine.unit_price = price.price
+                      newChildLine.product_id = i.product_id
+
+                      childLine.push(newChildLine)
                     }
-                  })
-
-                  newLine.unit_price = price.price
-                  newChildLine.volume = i.volume
-                  newChildLine.unit_price = price.price
-                  newChildLine.product_id = i.product_id
-
-                  childLine.push(newChildLine)
-                }
-              }))
-              newLine.child_product = childLine
+                  }
+                }))
+                newLine.child_product = childLine
+              }
+              quotationLines.push(newLine)
             }
-            quotationLines.push(newLine)
           }))
         }
 
