@@ -66,7 +66,9 @@ export const defaultAdminQuotationRelations = [
   "sale_persion",
   "region",
   "quotation_lines",
-  "quotation_lines.child_product"
+  "quotation_lines.product",
+  "quotation_lines.child_product",
+  "quotation_lines.child_product.product"
 ]
 
 export const defaultAdminQuotationFields: (keyof Quotation)[] = [
@@ -74,7 +76,7 @@ export const defaultAdminQuotationFields: (keyof Quotation)[] = [
   "code",
   "date",
   "heading",
-    "header",
+  "header",
   "condition",
   "payment_term",
   "delivery_lead_time",

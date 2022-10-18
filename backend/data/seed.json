@@ -1,6 +1,6 @@
 {
   "store": {
-    "currencies": ["eur", "usd", "vnd"]
+    "currencies": ["usd", "sdg", "myr"]
   },
   "users": [
     {
@@ -35,7 +35,7 @@
     {
       "id": "region-vietname",
       "name": "Viet Nam",
-      "currency_code": "vnd",
+      "currency_code": "usd",
       "tax_rate": 0,
       "payment_providers": [],
       "fulfillment_providers": [],
@@ -44,7 +44,7 @@
     {
       "id": "region-malaysia",
       "name": "Malaysia",
-      "currency_code": "usd",
+      "currency_code": "myr",
       "tax_rate": 0,
       "payment_providers": [],
       "fulfillment_providers": [],
@@ -53,7 +53,7 @@
     {
       "id": "region-singapore",
       "name": "Singapore",
-      "currency_code": "usd",
+      "currency_code": "sdg",
       "tax_rate": 0,
       "payment_providers": [],
       "fulfillment_providers": [],

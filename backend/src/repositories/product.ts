@@ -369,7 +369,6 @@ export class ProductRepository extends Repository<Product> {
       )
       .skip(cleanedOptions.skip)
       .take(cleanedOptions.take)
-        .orderBy('product.updated_at', 'DESC')
 
     if (cleanedOptions.withDeleted) {
       qb = qb.withDeleted()
