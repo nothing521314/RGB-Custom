@@ -16,15 +16,16 @@ import { DbAwareColumn } from "../utils/db-aware-column"
 import { Order } from "./order"
 import { SoftDeletableEntity } from "../interfaces/models/soft-deletable-entity"
 import { generateEntityId } from "../utils/generate-entity-id"
-import {PERSON_IN_CHARGE} from "../common/configurations";
+import {Unique} from "typeorm";
 
 @Entity()
+@Unique(['email', 'name'])
 export class Customer extends SoftDeletableEntity {
-  @Index({ unique: true })
-  @Column()
+  @Index()
+  @Column({ nullable: false })
   email: string
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
   name: string
 
   @Column({  nullable: true })
