@@ -313,6 +313,7 @@ export class QoutationRepository extends Repository<Quotation> {
                 new Brackets((qb) => {
                     qb.where(`quotation.code ILIKE :q`, {q: `%${q}%`})
                         .orWhere(`quotation.title ILIKE :q`, {q: `%${q}%`})
+                        .orWhere(`customer.name ILIKE :q`, {q: `%${q}%`})
                 })
             )
             .skip(cleanedOptions.skip)
