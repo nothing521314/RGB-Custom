@@ -676,13 +676,15 @@ class ProductService extends TransactionBaseService {
                         else
                             await productPriceRepo.delete(productPrice.id)
                     } else {
-                        const newPrice = await productPriceRepo.create({
-                            product_id: productId,
-                            region_id: item.region,
-                            price: item.value,
-                        })
+                        if(item.value > 0){
+                            const newPrice = await productPriceRepo.create({
+                                product_id: productId,
+                                region_id: item.region,
+                                price: item.value,
+                            })
 
-                        await productPriceRepo.save(newPrice)
+                            await productPriceRepo.save(newPrice)
+                        }
                     }
                 }))
             }

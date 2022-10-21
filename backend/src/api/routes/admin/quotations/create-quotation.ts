@@ -39,8 +39,6 @@ export default async (req, res) => {
     return quotation
   })
 
-  console.log(newQuotation)
-
   const quotation = await quotationService.retrieve(newQuotation.id, {
     select: defaultAdminQuotationFields,
     relations: defaultAdminQuotationRelations,
@@ -134,8 +132,24 @@ export class AdminPostQuotationLineReq {
   volume: number
 
   @IsOptional()
-  @Type(() => AdminPostQuotationLineReq)
+  @Type(() => AdminPostQuotationLineChildReq)
   @ValidateNested({ each: true })
   @IsArray()
-  child_product?: AdminPostQuotationLineReq[]
+  child_product?: AdminPostQuotationLineChildReq[]
+}
+
+export class AdminPostQuotationLineChildReq {
+  @IsNotEmpty()
+  @IsString()
+  product_id: string
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Min(1)
+  volume: number
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  game: string
 }

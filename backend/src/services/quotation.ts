@@ -244,7 +244,7 @@ class QuotationService extends TransactionBaseService {
                       newChildLine.volume = i.volume
                       newChildLine.unit_price = price.price
                       newChildLine.product_id = i.product_id
-
+                      newChildLine.game = i.game
                       childLine.push(newChildLine)
                     }
                   }
