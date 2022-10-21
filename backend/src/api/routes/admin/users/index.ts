@@ -14,8 +14,8 @@ export const unauthenticatedUserRoutes = (app) => {
 export default (app) => {
   const route2 = Router()
   app.use("/users-auth", route2)
-  route2.post("/",(req, res, next) => {console.log("oke"), console.log(req), next()} , middlewares.wrap(require("./reset-password-token").default))
-  // route2.post("/change-password", middlewares.wrap(require("./rest-password").default))
+
+  route2.post("/change-password", middlewares.wrap(require("./change-password").default))
 
   const route = Router()
   app.use("/users", route)

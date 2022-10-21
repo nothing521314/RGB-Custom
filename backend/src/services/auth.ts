@@ -5,6 +5,7 @@ import { TransactionBaseService } from "../interfaces"
 import UserService from "./user"
 import CustomerService from "./customer"
 import { EntityManager } from "typeorm"
+import {MedusaError} from "medusa-core-utils";
 
 type InjectedDependencies = {
   manager: EntityManager
@@ -42,6 +43,21 @@ class AuthService extends TransactionBaseService {
   ): Promise<boolean> {
     const buf = Buffer.from(hash, "base64")
     return Scrypt.verify(buf, password)
+  }
+
+  async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<User> {
+    const user = await this.userService_.retrieve(userId, {
+      select: ['password_hash', 'id']
+    })
+
+    if(!user || !(await (this.comparePassword_(oldPassword, user.password_hash)))){
+      throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          "User ID invalid or Password invalid"
+      )
+    }
+
+    return await this.userService_.setPassword_(userId, newPassword)
   }
 
   /**
