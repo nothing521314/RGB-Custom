@@ -3,9 +3,9 @@ import {MedusaError} from "medusa-core-utils"
 import Scrypt from "scrypt-kdf"
 import {DeepPartial, EntityManager, Like} from "typeorm"
 import {TransactionBaseService} from "../interfaces"
-import {User} from "../models"
+import {Product, ProductPrice, User} from "../models"
 import {UserRepository} from "../repositories/user"
-import {FindConfig} from "../types/common"
+import {FindConfig, Selector} from "../types/common"
 import {
     CreateUserInput,
     FilterableUserProps,
@@ -15,6 +15,7 @@ import {buildQuery, setMetadata} from "../utils"
 import {validateEmail} from "../utils/is-email"
 import EventBusService from "./event-bus"
 import {RegionRepository} from "../repositories/region";
+import {FilterableProductProps, FindProductConfig} from "../types/product";
 
 type UserServiceProps = {
     userRepository: typeof UserRepository

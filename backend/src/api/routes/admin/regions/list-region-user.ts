@@ -1,10 +1,12 @@
 import { IsNumber, IsOptional, IsString } from "class-validator"
-import { PricingService, ProductService } from "../../../../services"
+import {PricingService, ProductService, RegionService, UserService} from "../../../../services"
 
 import { FilterableProductProps } from "../../../../types/product"
 import { PricedProduct } from "../../../../types/pricing"
 import { Product } from "../../../../models"
 import { Type } from "class-transformer"
+import {validator} from "../../../../utils/validator";
+import {AdminGetRegionsParams} from "./list-regions";
 
 /**
  * @oas [get] /products
@@ -203,34 +205,28 @@ import { Type } from "class-transformer"
  *     $ref: "#/components/responses/500_error"
  */
 export default async (req, res) => {
-  const productService: ProductService = req.scope.resolve("productService")
-  const pricingService: PricingService = req.scope.resolve("pricingService")
+  const regionService: RegionService = req.scope.resolve("regionService")
 
-  const { skip, take, relations } = req.listConfig
+  const {region_id} = req.params
+  const validated = await validator(AdminGetProductsParamss, req.query)
 
-  const [rawProducts, count] = await productService.listAndCount(
-    req.filterableFields,
-    req.listConfig
+  const [rawUser, count] = await regionService.listAndCountByRegion(
+      region_id,
+      req.filterableFields,
+      req.listConfig,
+      validated.skip,
+      validated.take
   )
-
-  let products: (Product | PricedProduct)[] = rawProducts
-
-  const includesPricing = ["variants", "variants.prices"].every((relation) =>
-    relations?.includes(relation)
-  )
-  if (includesPricing) {
-    products = await pricingService.setProductPrices(rawProducts)
-  }
 
   res.json({
-    products,
+    user: rawUser,
     count,
-    offset: skip,
-    limit: take,
+    offset: validated.skip,
+    limit: validated.take,
   })
 }
 
-export class AdminGetProductsParams extends FilterableProductProps {
+class AdminGetProductsParamss extends FilterableProductProps {
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
@@ -240,12 +236,4 @@ export class AdminGetProductsParams extends FilterableProductProps {
   @IsOptional()
   @Type(() => Number)
   take?: number = 50
-
-  @IsString()
-  @IsOptional()
-  expand?: string
-
-  @IsString()
-  @IsOptional()
-  fields?: string
 }

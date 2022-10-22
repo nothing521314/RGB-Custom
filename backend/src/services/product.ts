@@ -178,6 +178,38 @@ class ProductService extends TransactionBaseService {
         return await productRepo.findWithRelationsAndCount(relations, query)
     }
 
+    async listAndCountByRegion(
+        region_id: string,
+        selector: FilterableProductProps | Selector<Product>,
+        config: {
+            relations: [],
+            skip: 0,
+            take: 20,
+            include_discount_prices: false,
+        },
+        skip = 0,
+        take = 50
+    ): Promise<[Product[], number]> {
+        const manager = this.manager_
+        const productRepo = manager.getCustomRepository(this.productRepository_)
+
+        // const count = await productRepo.count({
+        //     where: {
+        //         region_id: region_id
+        //     }
+        // })
+
+        const product = await productRepo.createQueryBuilder("products")
+            .leftJoinAndSelect("products.prices", "prices")
+            .leftJoinAndSelect("products.images", "images")
+            .where("prices.region_id = :region_id", {region_id})
+            .skip(skip)
+            .take(take)
+            .getMany()
+
+        return [product, 2]
+    }
+
 
     async listBrandAndCount(q = undefined,
         config: FindProductConfig = {
@@ -1105,6 +1137,44 @@ class ProductService extends TransactionBaseService {
             q,
         }
     }
+
+    protected prepareListQueryRS_(
+        selector: FilterableProductProps | Selector<Product>,
+        config: FindProductConfig
+    ): {
+        q: string
+        relations: (keyof Product)[]
+        query: FindWithoutRelationsOptions
+    } {
+        let q
+        if ("q" in selector) {
+            q = selector.q
+            delete selector.q
+        }
+
+        const query = buildQuery(selector, config)
+
+        if (config.relations && config.relations.length > 0) {
+            query.relations = config.relations
+        }
+
+        if (config.select && config.select.length > 0) {
+            query.select = config.select
+        }
+
+        const rels = query.relations
+        delete query.relations
+
+        console.log(query)
+
+        return {
+            query: query as FindWithoutRelationsOptions,
+            relations: rels as (keyof Product)[],
+            q,
+        }
+    }
 }
+
+
 
 export default ProductService

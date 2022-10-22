@@ -1,10 +1,16 @@
 import { Router } from "express"
 import { Region } from "../../../.."
 import { DeleteResponse, PaginatedResponse } from "../../../../types/common"
-import middlewares from "../../../middlewares"
+import middlewares, {transformQuery} from "../../../middlewares"
 import "reflect-metadata"
 import { FlagRouter } from "../../../../utils/flag-router"
 import TaxInclusivePricingFeatureFlag from "../../../../loaders/feature-flags/tax-inclusive-pricing"
+import {
+  AdminGetProductsParams,
+  allowedAdminProductFields,
+  defaultAdminProductFields,
+  defaultAdminProductRelations
+} from "../products";
 
 const route = Router()
 
@@ -51,6 +57,28 @@ export default (app, featureFlagRouter: FlagRouter) => {
   route.post(
       "/:region_id/product/:product_id",
       middlewares.wrap(require("./update-region-product").default)
+  )
+
+  route.get(
+      "/:region_id/products",
+      transformQuery(AdminGetProductsParams, {
+        defaultRelations: defaultAdminProductRelations,
+        defaultFields: defaultAdminProductFields,
+        allowedFields: allowedAdminProductFields,
+        isList: true,
+      }),
+      middlewares.wrap(require("./list-region-product").default)
+  )
+
+  route.get(
+      "/:region_id/users",
+      transformQuery(AdminGetProductsParams, {
+        defaultRelations: defaultAdminProductRelations,
+        defaultFields: defaultAdminProductFields,
+        allowedFields: allowedAdminProductFields,
+        isList: true,
+      }),
+      middlewares.wrap(require("./list-region-user").default)
   )
 
   route.delete(

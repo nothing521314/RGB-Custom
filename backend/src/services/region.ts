@@ -4,7 +4,7 @@ import { MedusaError } from "medusa-core-utils"
 
 import { TransactionBaseService } from "../interfaces"
 import TaxInclusivePricingFeatureFlag from "../loaders/feature-flags/tax-inclusive-pricing"
-import { Country, Currency, Region } from "../models"
+import {Country, Currency, Product, ProductPrice, Region, User} from "../models"
 import { CountryRepository } from "../repositories/country"
 import { CurrencyRepository } from "../repositories/currency"
 import { FulfillmentProviderRepository } from "../repositories/fulfillment-provider"
@@ -22,6 +22,8 @@ import { PaymentProviderService } from "./index"
 import StoreService from "./store"
 import {ProductPriceRepository} from "../repositories/product-price";
 import {ProductRepository} from "../repositories/product";
+import {FilterableProductProps, FindProductConfig} from "../types/product";
+import {UserRepository} from "../repositories/user";
 
 type InjectedDependencies = {
   manager: EntityManager
@@ -39,6 +41,7 @@ type InjectedDependencies = {
   fulfillmentProviderRepository: typeof FulfillmentProviderRepository
   productPriceRepository: typeof ProductPriceRepository
   productRepository: typeof ProductRepository
+  userRepository: typeof UserRepository
 }
 
 /**
@@ -68,6 +71,7 @@ class RegionService extends TransactionBaseService {
   protected readonly taxProviderRepository_: typeof TaxProviderRepository
   protected readonly productPriceRepository_: typeof ProductPriceRepository
   protected readonly productRepository_: typeof ProductRepository
+  protected readonly userRepository_: typeof UserRepository
 
   constructor({
     manager,
@@ -84,6 +88,7 @@ class RegionService extends TransactionBaseService {
     paymentProviderService,
     fulfillmentProviderService,
     featureFlagRouter,
+                userRepository
   }: InjectedDependencies) {
     super({
       manager,
@@ -100,6 +105,7 @@ class RegionService extends TransactionBaseService {
       paymentProviderService,
       fulfillmentProviderService,
       featureFlagRouter,
+      userRepository
     })
 
     this.manager_ = manager
@@ -116,6 +122,7 @@ class RegionService extends TransactionBaseService {
     this.productPriceRepository_ = productPriceRepository
     this.productRepository_ = productRepository
     this.featureFlagRouter_ = featureFlagRouter
+    this.userRepository_ = userRepository
   }
 
   /**
@@ -317,7 +324,6 @@ class RegionService extends TransactionBaseService {
     })
   }
 
-
   /**
    * Validates fields for creation and updates. If the region already exists
    * the id can be passed to check that country updates are allowed.
@@ -421,6 +427,8 @@ class RegionService extends TransactionBaseService {
     }
   }
 
+
+
   /**
    * Validates a currency code. Will throw if the currency code doesn't exist.
    *
@@ -444,6 +452,38 @@ class RegionService extends TransactionBaseService {
       )
     }
   }
+
+  async listAndCountByRegion(
+      region_id: string,
+      selector: FilterableProductProps | Selector<Product>,
+      config: FindProductConfig = {
+        relations: [],
+        skip: 0,
+        take: 20,
+        include_discount_prices: false,
+      },
+      skip= 0,
+      take=  50,
+  ): Promise<[User[], number]> {
+    const manager = this.manager_
+    const userRepository = manager.getCustomRepository(this.userRepository_)
+
+
+    const count = await userRepository.createQueryBuilder("users")
+        .leftJoinAndSelect("users.regions", "regions")
+        .where("regions.id = :region_id", {region_id})
+        .getCount()
+
+    const users = await userRepository.createQueryBuilder("users")
+        .leftJoinAndSelect("users.regions", "regions")
+        .where("regions.id = :region_id", {region_id})
+        .skip(skip)
+        .take(take)
+        .getMany()
+
+    return [users, count]
+  }
+
 
   /**
    * Validates a country code. Will normalize the code before checking for
