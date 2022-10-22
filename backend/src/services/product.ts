@@ -165,7 +165,6 @@ class ProductService extends TransactionBaseService {
     ): Promise<[Product[], number]> {
         const manager = this.manager_
         const productRepo = manager.getCustomRepository(this.productRepository_)
-
         const {q, query, relations} = this.prepareListQuery_(selector, config)
 
         if (q) {
@@ -175,6 +174,7 @@ class ProductService extends TransactionBaseService {
                 relations
             )
         }
+
         return await productRepo.findWithRelationsAndCount(relations, query)
     }
 

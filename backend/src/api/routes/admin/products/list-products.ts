@@ -206,7 +206,7 @@ export default async (req, res) => {
   const productService: ProductService = req.scope.resolve("productService")
   const pricingService: PricingService = req.scope.resolve("pricingService")
 
-  const { skip, take, relations } = req.listConfig
+  const { limit, offset, relations } = req.listConfig
 
   const [rawProducts, count] = await productService.listAndCount(
     req.filterableFields,
@@ -225,8 +225,8 @@ export default async (req, res) => {
   res.json({
     products,
     count,
-    offset: skip,
-    limit: take,
+    offset: offset,
+    limit: limit,
   })
 }
 
@@ -234,12 +234,12 @@ export class AdminGetProductsParams extends FilterableProductProps {
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  skip?: number = 0
+  offset?: number = 0
 
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  take?: number = 50
+  limit?: number = 50
 
   @IsString()
   @IsOptional()

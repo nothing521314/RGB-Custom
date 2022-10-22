@@ -300,17 +300,17 @@ class RegionService extends TransactionBaseService {
         }
       })
 
-      if(productPrice && price !== 0){
+      if(productPrice && price > 0){
         await productPriceRepository.save({
          ...productPrice, price: price
         })
       }
 
-      if(productPrice && price === 0) {
+      if(productPrice && price <= 0) {
         await productPriceRepository.delete(productPrice.id)
       }
 
-      if(!productPrice && price !== 0) {
+      if(!productPrice && price > 0) {
         const newProductPrice = await productPriceRepository.create({
           product_id: productId,
           region_id: regionId,
@@ -712,6 +712,54 @@ class RegionService extends TransactionBaseService {
    * @param code - a 2 digit alphanumeric ISO country code.
    * @return the updated Region
    */
+  async addUser(regionId: string, userId): Promise<Region>{
+    return await this.atomicPhase_(async (manager) => {
+      const regionRepo = manager.getCustomRepository(this.regionRepository_)
+      const userRepo = manager.getCustomRepository(this.userRepository_)
+
+      const region = await regionRepo.findOne(regionId, {
+        relations: ['users']
+      })
+      if(!region){
+        throw new MedusaError(MedusaError.Types.INVALID_DATA, "Invalid Region ID")
+      }
+
+      const user = await userRepo.findOne(userId)
+      if(!user){
+        throw new MedusaError(MedusaError.Types.INVALID_DATA, "Invalid User ID")
+      }
+
+      return await regionRepo.save({
+        ...region,
+        users: [...region.users, user]
+      })
+    })
+  }
+
+  async removeUser(regionId: string, userId): Promise<Region>{
+    return await this.atomicPhase_(async (manager) => {
+      const regionRepo = manager.getCustomRepository(this.regionRepository_)
+      const userRepo = manager.getCustomRepository(this.userRepository_)
+
+      const region = await regionRepo.findOne(regionId, {
+        relations: ['users']
+      })
+      if(!region){
+        throw new MedusaError(MedusaError.Types.INVALID_DATA, "Invalid Region ID")
+      }
+
+      const user = await userRepo.findOne(userId)
+      if(!user){
+        throw new MedusaError(MedusaError.Types.INVALID_DATA, "Invalid User ID")
+      }
+
+      return await regionRepo.save({
+        ...region,
+        users: [...region.users.filter(item => item.id !== user.id)]
+      })
+    })
+  }
+
   async addCountry(regionId: string, code: Country["iso_2"]): Promise<Region> {
     return await this.atomicPhase_(async (manager) => {
       const regionRepo = manager.getCustomRepository(this.regionRepository_)

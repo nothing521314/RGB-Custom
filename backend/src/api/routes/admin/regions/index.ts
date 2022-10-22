@@ -50,6 +50,20 @@ export default (app, featureFlagRouter: FlagRouter) => {
   )
 
   route.post(
+      "/:region_id/region-user/:user_id",
+      middlewares.wrap(require("./add-user").default)
+  )
+  route.delete(
+      "/:region_id/region-user/:user_id",
+      middlewares.wrap(require("./remove-user").default)
+  )
+  route.post(
+      "/:region_id/product/:product_id",
+      middlewares.wrap(require("./update-product").default)
+  )
+
+
+  route.post(
     "/:region_id/payment-providers",
     middlewares.wrap(require("./add-payment-provider").default)
   )
