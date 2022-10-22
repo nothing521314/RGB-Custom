@@ -7,6 +7,7 @@ deploy:
 				--exclude .tmp \
 				--exclude .idea \
 				--exclude docker \
+				--exclude src/migrations \
 				--exclude .env \
 				--exclude .env.development \
 				--exclude dist \
