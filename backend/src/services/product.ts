@@ -193,11 +193,12 @@ class ProductService extends TransactionBaseService {
         const manager = this.manager_
         const productRepo = manager.getCustomRepository(this.productRepository_)
 
-        // const count = await productRepo.count({
-        //     where: {
-        //         region_id: region_id
-        //     }
-        // })
+        const count = await productRepo.createQueryBuilder("products")
+            .leftJoinAndSelect("products.prices", "prices")
+            .leftJoinAndSelect("products.images", "images")
+            .where("prices.region_id = :region_id", {region_id})
+            .getCount()
+
 
         const product = await productRepo.createQueryBuilder("products")
             .leftJoinAndSelect("products.prices", "prices")
@@ -207,38 +208,42 @@ class ProductService extends TransactionBaseService {
             .take(take)
             .getMany()
 
-        return [product, 2]
+        return [product, count]
     }
 
 
     async listBrandAndCount(q = undefined,
-        config: FindProductConfig = {
-            relations: [],
-            skip: 0,
-            take: 20,
-        }
+                            config: FindProductConfig = {
+                                relations: [],
+                                skip: 0,
+                                take: 20,
+                            }
     ): Promise<[Product[], number]> {
         const manager = this.manager_
         let res, branch
 
-        if(q != undefined){
-         //TODO: FIX MEEEE
-         res = await manager.query(`select brand from product group by brand having brand like '%${q}%'`)
-             branch = await manager.query(`select brand
-                                            from product
-                                            group by brand
-                                            having "brand" like '%${q}%'
-                                            limit ${config.take}
-                                            offset ${config.skip} `)
+        if (q != undefined) {
+            //TODO: FIX MEEEE
+            res = await manager.query(`select brand
+                                       from product
+                                       group by brand
+                                       having brand like '%${q}%'`)
+            branch = await manager.query(`select brand
+                                          from product
+                                          group by brand
+                                          having "brand" like '%${q}%'
+                                              limit ${config.take}
+                                          offset ${config.skip} `)
         } else {
-             res = await manager.query(`select brand from product group by brand`)
-             branch = await manager.query(`select brand
-                                            from product
-                                            group by brand
-                                            limit ${config.take}
-                                            offset ${config.skip} `)
+            res = await manager.query(`select brand
+                                       from product
+                                       group by brand`)
+            branch = await manager.query(`select brand
+                                          from product
+                                          group by brand
+                                              limit ${config.take}
+                                          offset ${config.skip} `)
         }
-
 
 
         return [branch, res.length]
@@ -708,7 +713,7 @@ class ProductService extends TransactionBaseService {
                         else
                             await productPriceRepo.delete(productPrice.id)
                     } else {
-                        if(item.value > 0){
+                        if (item.value > 0) {
                             const newPrice = await productPriceRepo.create({
                                 product_id: productId,
                                 region_id: item.region,
@@ -1174,7 +1179,6 @@ class ProductService extends TransactionBaseService {
         }
     }
 }
-
 
 
 export default ProductService

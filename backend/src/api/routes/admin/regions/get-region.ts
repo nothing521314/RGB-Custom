@@ -82,5 +82,4 @@ const defaultAdminGetOneRegionFields: (keyof Region)[] = [
 
 const defaultAdminGetOneRegionRelations = [
   "countries",
-  "product_prices",
 ]
