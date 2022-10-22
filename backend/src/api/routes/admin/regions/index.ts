@@ -47,6 +47,12 @@ export default (app, featureFlagRouter: FlagRouter) => {
     "/:region_id/payment-providers",
     middlewares.wrap(require("./add-payment-provider").default)
   )
+
+  route.post(
+      "/:region_id/product/:product_id",
+      middlewares.wrap(require("./update-region-product").default)
+  )
+
   route.delete(
     "/:region_id/payment-providers/:provider_id",
     middlewares.wrap(require("./remove-payment-provider").default)

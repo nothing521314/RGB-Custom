@@ -1,6 +1,7 @@
 import { defaultAdminRegionFields, defaultAdminRegionRelations } from "."
 
 import RegionService from "../../../../services/region"
+import {Region} from "../../../../models";
 
 /**
  * @oas [get] /regions/{id}
@@ -57,9 +58,32 @@ export default async (req, res) => {
   const { region_id } = req.params
   const regionService: RegionService = req.scope.resolve("regionService")
   const region = await regionService.retrieve(region_id, {
-    select: defaultAdminRegionFields,
-    relations: defaultAdminRegionRelations,
+    select: defaultAdminGetOneRegionFields,
+    relations: defaultAdminGetOneRegionRelations,
   })
 
   res.status(200).json({ region })
 }
+
+const defaultAdminGetOneRegionFields: (keyof Region)[] = [
+  "id",
+  "name",
+  "automatic_taxes",
+  "gift_cards_taxable",
+  "tax_provider_id",
+  "currency_code",
+  "tax_rate",
+  "tax_code",
+  "created_at",
+  "updated_at",
+  "deleted_at",
+  "metadata",
+]
+
+const defaultAdminGetOneRegionRelations = [
+  "countries",
+  "users",
+  "product_prices",
+  "product_prices.product",
+  "product_prices.product.images"
+]

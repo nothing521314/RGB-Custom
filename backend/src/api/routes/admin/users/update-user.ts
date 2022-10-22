@@ -106,6 +106,14 @@ export class AdminUpdateUserRequest {
 
   @IsString()
   @IsOptional()
+  email?: string
+
+  @IsString()
+  @IsOptional()
+  password?: string
+
+  @IsString()
+  @IsOptional()
   phone?: string
 
   @IsEnum(UserRoles)

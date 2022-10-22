@@ -1,4 +1,4 @@
-import { DeepPartial, EntityManager } from "typeorm"
+import {DeepPartial, EntityManager, FindOperator, In, IsNull, Raw} from "typeorm"
 
 import { MedusaError } from "medusa-core-utils"
 
@@ -11,7 +11,7 @@ import { FulfillmentProviderRepository } from "../repositories/fulfillment-provi
 import { PaymentProviderRepository } from "../repositories/payment-provider"
 import { RegionRepository } from "../repositories/region"
 import { TaxProviderRepository } from "../repositories/tax-provider"
-import { FindConfig, Selector } from "../types/common"
+import {ExtendedFindConfig, FindConfig, Selector, Writable} from "../types/common"
 import { CreateRegionInput, UpdateRegionInput } from "../types/region"
 import { buildQuery, setMetadata } from "../utils"
 import { countries } from "../utils/countries"
@@ -20,6 +20,8 @@ import EventBusService from "./event-bus"
 import FulfillmentProviderService from "./fulfillment-provider"
 import { PaymentProviderService } from "./index"
 import StoreService from "./store"
+import {ProductPriceRepository} from "../repositories/product-price";
+import {ProductRepository} from "../repositories/product";
 
 type InjectedDependencies = {
   manager: EntityManager
@@ -35,6 +37,8 @@ type InjectedDependencies = {
   taxProviderRepository: typeof TaxProviderRepository
   paymentProviderRepository: typeof PaymentProviderRepository
   fulfillmentProviderRepository: typeof FulfillmentProviderRepository
+  productPriceRepository: typeof ProductPriceRepository
+  productRepository: typeof ProductRepository
 }
 
 /**
@@ -62,11 +66,15 @@ class RegionService extends TransactionBaseService {
   protected readonly paymentProviderRepository_: typeof PaymentProviderRepository
   protected readonly fulfillmentProviderRepository_: typeof FulfillmentProviderRepository
   protected readonly taxProviderRepository_: typeof TaxProviderRepository
+  protected readonly productPriceRepository_: typeof ProductPriceRepository
+  protected readonly productRepository_: typeof ProductRepository
 
   constructor({
     manager,
     regionRepository,
     countryRepository,
+    productPriceRepository,
+    productRepository,
     storeService,
     eventBusService,
     currencyRepository,
@@ -81,6 +89,8 @@ class RegionService extends TransactionBaseService {
       manager,
       regionRepository,
       countryRepository,
+      productPriceRepository,
+      productRepository,
       storeService,
       eventBusService,
       currencyRepository,
@@ -103,7 +113,8 @@ class RegionService extends TransactionBaseService {
     this.paymentProviderService_ = paymentProviderService
     this.taxProviderRepository_ = taxProviderRepository
     this.fulfillmentProviderService_ = fulfillmentProviderService
-
+    this.productPriceRepository_ = productPriceRepository
+    this.productRepository_ = productRepository
     this.featureFlagRouter_ = featureFlagRouter
   }
 
@@ -248,6 +259,64 @@ class RegionService extends TransactionBaseService {
       return result
     })
   }
+
+  async updateProduct(regionId: string, productId: string, price: number): Promise<Region> {
+    return await this.atomicPhase_(async (manager) => {
+      const productPriceRepository = manager.getCustomRepository(
+          this.productPriceRepository_
+      )
+
+      const regionRepository = manager.getCustomRepository(
+          this.regionRepository_
+      )
+
+      const productRepository = manager.getCustomRepository(
+          this.productRepository_
+      )
+
+      const product = await productRepository.findOne(productId)
+
+      if(!product){
+        throw new MedusaError(MedusaError.Types.INVALID_DATA, "Invalid product ID")
+      }
+
+      const region = await regionRepository.findOne(regionId)
+
+      if(!region){
+        throw new MedusaError(MedusaError.Types.INVALID_DATA, "Invalid region ID")
+      }
+
+      const productPrice = await productPriceRepository.findOne({
+        where: {
+          product_id: productId,
+          region_id: regionId,
+        }
+      })
+
+      if(productPrice && price !== 0){
+        await productPriceRepository.save({
+         ...productPrice, price: price
+        })
+      }
+
+      if(productPrice && price === 0) {
+        await productPriceRepository.delete(productPrice.id)
+      }
+
+      if(!productPrice && price !== 0) {
+        const newProductPrice = await productPriceRepository.create({
+          product_id: productId,
+          region_id: regionId,
+          price: price
+        })
+
+        await productPriceRepository.save(newProductPrice)
+      }
+
+      return await this.retrieve(regionId)
+    })
+  }
+
 
   /**
    * Validates fields for creation and updates. If the region already exists
@@ -529,7 +598,41 @@ class RegionService extends TransactionBaseService {
     const regionRepo = this.manager_.getCustomRepository(this.regionRepository_)
 
     const query = buildQuery(selector, config)
+
     return regionRepo.find(query)
+  }
+
+    async list2(
+        selector: Selector<Region> = {},
+        config: FindConfig<Region> = {
+            relations: [],
+            skip: 0,
+            take: 10,
+        },
+        query= ""
+    ): Promise<Region[]> {
+        const regionRepo = this.manager_.getCustomRepository(this.regionRepository_)
+
+        return await regionRepo.createQueryBuilder("region")
+            .where("region.name LIKE :name OR region.currency_code LIKE :name", {name: `%${query}%`})
+            .leftJoin('region.users', 'users')
+            .loadRelationCountAndMap('region.user_count', 'region.users') // count posts for each user
+            .leftJoin('region.product_prices', 'product_prices')
+            .loadRelationCountAndMap('region.product_count', 'region.product_prices')
+            .skip(config.skip)
+            .take(config.take)
+            .getMany();
+    }
+
+  async list2count(): Promise<number> {
+    const regionRepo = this.manager_.getCustomRepository(this.regionRepository_)
+
+    return await regionRepo.createQueryBuilder("region")
+        .leftJoin('region.users', 'users')
+        .loadRelationCountAndMap('region.user_count', 'region.users') // count posts for each user
+        .leftJoin('region.product_prices', 'product_prices')
+        .loadRelationCountAndMap('region.product_count', 'region.product_prices')
+        .getCount();
   }
 
   /**

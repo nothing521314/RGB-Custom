@@ -18,6 +18,7 @@ export interface CreateUserInput {
 export interface UpdateUserInput {
   readonly email?: string
   name?: string
+  password?: string
   phone?: string
   readonly password_hash?: string
   api_token?: string

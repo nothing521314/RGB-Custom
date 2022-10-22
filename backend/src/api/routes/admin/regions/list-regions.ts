@@ -1,12 +1,12 @@
-import { IsInt, IsOptional, ValidateNested } from "class-validator"
-import _, { identity } from "lodash"
-import { defaultAdminRegionFields, defaultAdminRegionRelations } from "."
+import {IsInt, IsOptional, IsString, ValidateNested} from "class-validator"
+import _, {identity} from "lodash"
+import {defaultAdminRegionFields, defaultAdminRegionRelations} from "."
 
-import { DateComparisonOperator } from "../../../../types/common"
-import { Region } from "../../../.."
+import {DateComparisonOperator} from "../../../../types/common"
+import {Region} from "../../../.."
 import RegionService from "../../../../services/region"
-import { Type } from "class-transformer"
-import { validator } from "../../../../utils/validator"
+import {Type} from "class-transformer"
+import {validator} from "../../../../utils/validator"
 
 /**
  * @oas [get] /regions
@@ -102,57 +102,61 @@ import { validator } from "../../../../utils/validator"
  *     $ref: "#/components/responses/500_error"
  */
 export default async (req, res) => {
-  const validated = await validator(AdminGetRegionsParams, req.query)
+    const validated = await validator(AdminGetRegionsParams, req.query)
 
-  const regionService: RegionService = req.scope.resolve("regionService")
+    const regionService: RegionService = req.scope.resolve("regionService")
 
-  const filterableFields = _.omit(validated, ["limit", "offset"])
+    const filterableFields = _.omit(validated, ["limit", "offset"])
 
-  const listConfig = {
-    select: defaultAdminRegionFields,
-    relations: defaultAdminRegionRelations,
-    skip: validated.offset,
-    take: validated.limit,
-  }
+    const listConfig = {
+        select: defaultAdminRegionFields,
+        relations: defaultAdminRegionRelations,
+        skip: validated.offset,
+        take: validated.limit,
+    }
 
-  const regions: Region[] = await regionService.list(
-    _.pickBy(filterableFields, identity),
-    listConfig
-  )
+    const regions: Region[] = await regionService.list2(
+        _.pickBy(filterableFields, identity),
+        listConfig, validated.q
+    )
 
-  res.json({
-    regions,
-    count: regions.length,
-    offset: validated.offset,
-    limit: validated.limit,
-  })
+    res.json({
+        regions,
+        count: regions.length,
+        offset: validated.offset,
+        limit: validated.limit,
+    })
 }
 
 export class AdminGetRegionsPaginationParams {
-  @IsInt()
-  @IsOptional()
-  @Type(() => Number)
-  limit?: number = 50
+    @IsInt()
+    @IsOptional()
+    @Type(() => Number)
+    limit?: number = 50
 
-  @IsInt()
-  @IsOptional()
-  @Type(() => Number)
-  offset?: number = 0
+    @IsInt()
+    @IsOptional()
+    @Type(() => Number)
+    offset?: number = 0
+
+    @IsOptional()
+    @IsString()
+    q?: string
 }
 
 export class AdminGetRegionsParams extends AdminGetRegionsPaginationParams {
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => DateComparisonOperator)
-  created_at?: DateComparisonOperator
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => DateComparisonOperator)
+    created_at?: DateComparisonOperator
 
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => DateComparisonOperator)
-  updated_at?: DateComparisonOperator
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => DateComparisonOperator)
+    updated_at?: DateComparisonOperator
 
-  @ValidateNested()
-  @IsOptional()
-  @Type(() => DateComparisonOperator)
-  deleted_at?: DateComparisonOperator
+    @ValidateNested()
+    @IsOptional()
+    @Type(() => DateComparisonOperator)
+    deleted_at?: DateComparisonOperator
 }

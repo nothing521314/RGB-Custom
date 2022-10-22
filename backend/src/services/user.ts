@@ -220,22 +220,13 @@ class UserService extends TransactionBaseService {
             const userRepo = manager.getCustomRepository(this.userRepository_)
             const regionRepo = manager.getCustomRepository(this.regionRepository_)
 
-            const user = await this.retrieve(userId)
+            let user = await this.retrieve(userId)
 
-            const {email, password_hash, metadata, regions, ...rest} = update
+            const { password, metadata, regions, ...rest} = update
 
-            if (email) {
-                throw new MedusaError(
-                    MedusaError.Types.INVALID_DATA,
-                    "You are not allowed to update email"
-                )
-            }
-
-            if (password_hash) {
-                throw new MedusaError(
-                    MedusaError.Types.INVALID_DATA,
-                    "Use dedicated methods, `setPassword`, `generateResetPasswordToken` for password operations"
-                )
+            if(password){
+                await this.setPassword_(userId, password)
+                user = await this.retrieve(userId)
             }
 
             const validateRegions = await regionRepo.findByIds(regions)

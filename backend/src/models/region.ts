@@ -21,6 +21,7 @@ import { generateEntityId } from "../utils/generate-entity-id"
 import { FeatureFlagColumn } from "../utils/feature-flag-decorators"
 import TaxInclusivePricingFeatureFlag from "../loaders/feature-flags/tax-inclusive-pricing"
 import {User} from "./user";
+import {ProductPrice} from "./product-price";
 
 @Entity()
 export class Region extends SoftDeletableEntity {
@@ -51,6 +52,9 @@ export class Region extends SoftDeletableEntity {
 
   @OneToMany(() => Country, (c) => c.region)
   countries: Country[]
+
+  @OneToMany(() => ProductPrice, (c) => c.region)
+  product_prices: ProductPrice[]
 
   @Column({ type: "text", nullable: true })
   tax_provider_id: string | null

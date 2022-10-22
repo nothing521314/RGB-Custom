@@ -256,7 +256,6 @@ class QuotationService extends TransactionBaseService {
           }))
         }
 
-        console.log(quotationLines)
 
         let quotation = quotationRepo.create({...rest, quotation_lines: quotationLines})
         quotation = await quotationRepo.save(quotation)
