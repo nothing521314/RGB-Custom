@@ -333,7 +333,7 @@ export class ProductPriceReq {
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
-  @Max(9999999999)
+  @Max(99999999999)
   value: number
 }
 
