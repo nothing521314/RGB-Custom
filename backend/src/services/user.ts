@@ -199,15 +199,13 @@ class UserService extends TransactionBaseService {
 
             createData.email = validatedEmail
 
-            const created = userRepo.create({...createData, regions: validateRegions})
-
-            const newUser = await userRepo.save(created)
-
-            await this.eventBus_
-                .withTransaction(manager)
-                .emit(UserService.Events.CREATED, {id: newUser.id})
-
-            return newUser
+            try{
+                const created = userRepo.create({...createData, regions: validateRegions})
+                const newUser = await userRepo.save(created)
+                return newUser
+            } catch (err) {
+                throw new MedusaError(MedusaError.Types.DUPLICATE_ERROR, "Duplicate email and name")
+            }
         })
     }
 
