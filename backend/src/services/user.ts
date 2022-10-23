@@ -337,7 +337,7 @@ class UserService extends TransactionBaseService {
     }
 
     async sendEmailResetPassword(userId: string): Promise<void>{
-        const {baseUrl, email_admin, password_email_admin} = configuration.projectConfig
+        const {reset_password_url, email_admin, password_email_admin} = configuration.projectConfig
         const token = await this.generateResetPasswordToken(userId)
 
         const user = await this.retrieve(userId, {
@@ -356,10 +356,10 @@ class UserService extends TransactionBaseService {
 
         const mainOptions = {
             from: 'RGB Quotation Admin',
-            to: email_admin,
+            to: user.email,
             subject: 'Reset Password',
             text: 'You recieved message from ' + user.email,
-            html: '<p>We received the request to reset the password for for account. To reset your account, please on this link and set up a new one.:' + baseUrl + token
+            html: `<p>We received the request to reset the password for account. To reset your account, please on <a href="${reset_password_url + token}">this link</a> and set up a new one.</p>`
         }
 
        transporter.sendMail(mainOptions)
