@@ -4,7 +4,7 @@ import {
   IsBoolean,
   IsEnum, IsNotEmpty, IsNumber,
   IsOptional,
-  IsString,
+  IsString, Max, Min,
   ValidateNested,
 } from "class-validator"
 import { Product, ProductOptionValue, ProductStatus } from "../models"
@@ -332,6 +332,8 @@ export class ProductPriceReq {
 
   @IsNotEmpty()
   @IsNumber()
+  @Min(0)
+  @Max(9999999999)
   value: number
 }
 

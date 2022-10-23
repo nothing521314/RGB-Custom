@@ -1,4 +1,4 @@
-import {BeforeInsert, Column, Entity, Index, JoinTable, ManyToMany} from "typeorm"
+import {BeforeInsert, Column, Entity, Index, JoinTable, ManyToMany, Unique} from "typeorm"
 
 import { DbAwareColumn } from "../utils/db-aware-column"
 import { SoftDeletableEntity } from "../interfaces/models/soft-deletable-entity"
@@ -8,6 +8,7 @@ import {Region} from "./region";
 import {Product} from "./product";
 
 @Entity()
+@Unique(['email', 'name'])
 export class User extends SoftDeletableEntity {
   @DbAwareColumn({
     type: "enum",
@@ -17,7 +18,6 @@ export class User extends SoftDeletableEntity {
   })
   role: UserRoles
 
-  @Index({ unique: true, where: "deleted_at IS NULL" })
   @Column()
   email: string
 

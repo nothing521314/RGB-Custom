@@ -15,7 +15,8 @@ import {buildQuery, setMetadata} from "../utils"
 import {validateEmail} from "../utils/is-email"
 import EventBusService from "./event-bus"
 import {RegionRepository} from "../repositories/region";
-import {FilterableProductProps, FindProductConfig} from "../types/product";
+import { createTransport } from "nodemailer"
+import configuration from "./../loaders/medusa-config"
 
 type UserServiceProps = {
     userRepository: typeof UserRepository
@@ -333,16 +334,37 @@ class UserService extends TransactionBaseService {
             const payload = {user_id: user.id, email: user.email, exp: expiry}
             const token = jwt.sign(payload, secret)
 
-            // Notify subscribers
-            await this.eventBus_
-                .withTransaction(transactionManager)
-                .emit(UserService.Events.PASSWORD_RESET, {
-                    email: user.email,
-                    token,
-                })
-
             return token
         })
+    }
+
+    async sendEmailResetPassword(userId: string): Promise<void>{
+        const {baseUrl, email_admin, password_email_admin} = configuration.projectConfig
+        const token = await this.generateResetPasswordToken(userId)
+
+        const user = await this.retrieve(userId, {
+            select: ["id", "email", "password_hash"],
+        })
+
+        const transporter =  createTransport({
+            service: 'Gmail',
+            host: 'smtp.gmail.com',
+            secure: true,
+            auth: {
+                user: email_admin,
+                pass: password_email_admin
+            }
+        });
+
+        const mainOptions = {
+            from: 'RGB Quotation Admin',
+            to: email_admin,
+            subject: 'Reset Password',
+            text: 'You recieved message from ' + user.email,
+            html: '<p>We received the request to reset the password for for account. To reset your account, please on this link and set up a new one.:' + baseUrl + token
+        }
+
+       transporter.sendMail(mainOptions)
     }
 }
 
