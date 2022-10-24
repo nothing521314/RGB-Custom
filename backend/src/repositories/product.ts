@@ -362,14 +362,22 @@ export class ProductRepository extends Repository<Product> {
             .leftJoinAndSelect("product.prices", "prices")
             .select(["product.id"])
             .where(cleanedOptions.where)
+            .andWhere(
+                new Brackets((qb) => {
+                    qb.where(`product.description ILIKE :q`, {q: `%${q}%`})
+                        .orWhere(`product.title ILIKE :q`, {q: `%${q}%`})
+                        .orWhere(`variant.title ILIKE :q`, {q: `%${q}%`})
+                        .orWhere(`variant.sku ILIKE :q`, {q: `%${q}%`})
+                        .orWhere(`collection.title ILIKE :q`, {q: `%${q}%`})
+                })
+            )
             .skip(cleanedOptions.skip)
             .take(cleanedOptions.take)
 
-        if (region_id !== undefined || region_id !== '') {
+        if (region_id !== undefined && region_id !== '') {
             qb.andWhere(new Brackets((qb) => {
                 qb.where('prices.region_id = :region_id', {
-                    region_id: region_id
-                })
+                    region_id: region_id})
             }))
         }
 
@@ -387,6 +395,8 @@ export class ProductRepository extends Repository<Product> {
 
         return [products, count]
     }
+
+
 
     public async getFreeTextSearchResultsAndCount2(
         options: FindWithoutRelationsOptions = {where: {}},
@@ -404,11 +414,10 @@ export class ProductRepository extends Repository<Product> {
             .skip(cleanedOptions.skip)
             .take(cleanedOptions.take)
 
-        if (region_id !== undefined || region_id !== '') {
+        if (region_id !== undefined && region_id !== '') {
             qb.andWhere(new Brackets((qb) => {
                 qb.where('prices.region_id = :region_id', {
-                    region_id: region_id
-                })
+                    region_id: region_id})
             }))
         }
 
@@ -426,6 +435,7 @@ export class ProductRepository extends Repository<Product> {
 
         return [products, count]
     }
+
 
     private _cleanOptions(
         options: FindWithoutRelationsOptions
