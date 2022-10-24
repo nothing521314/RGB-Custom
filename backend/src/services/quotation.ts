@@ -231,7 +231,7 @@ class QuotationService extends TransactionBaseService {
               newLine.unit_price = price.price
               newLine.product_id = item.product_id
               newLine.volume = item.volume
-
+              newLine.game = item.game
               if (item.child_product?.length) {
                 await Promise.all(item.child_product.map(async (i) => {
                   if (item.product_id !== i.product_id) {
@@ -247,7 +247,6 @@ class QuotationService extends TransactionBaseService {
                       newChildLine.volume = i.volume
                       newChildLine.unit_price = price.price
                       newChildLine.product_id = i.product_id
-                      newChildLine.game = i.game
                       childLine.push(newChildLine)
                     }
                   }

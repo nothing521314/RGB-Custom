@@ -132,6 +132,11 @@ export class AdminPostQuotationLineReq {
   volume: number
 
   @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  game: string
+
+  @IsOptional()
   @Type(() => AdminPostQuotationLineChildReq)
   @ValidateNested({ each: true })
   @IsArray()
@@ -147,9 +152,4 @@ export class AdminPostQuotationLineChildReq {
   @IsNumber()
   @Min(1)
   volume: number
-
-  @IsOptional()
-  @IsNotEmpty()
-  @IsString()
-  game: string
 }
