@@ -168,21 +168,16 @@ class ProductService extends TransactionBaseService {
         const productRepo = manager.getCustomRepository(this.productRepository_)
         const {q, query, relations} = this.prepareListQuery_(selector, config)
 
-        // @ts-ignore
-        region_Id && (query.where = (qb) => {
-            qb.where('prices.region_id = :region_id', {
-                region_id: region_Id
-            })})
-
         if (q) {
             return await productRepo.getFreeTextSearchResultsAndCount(
                 q,
                 query,
-                relations
+                relations,
+                region_Id
             )
         }
 
-        return await productRepo.findWithRelationsAndCount(relations, query)
+        return await productRepo.getFreeTextSearchResultsAndCount2(query, relations, region_Id)
     }
 
     async listAndCountByRegion(
