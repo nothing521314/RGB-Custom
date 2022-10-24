@@ -99,12 +99,15 @@ class QuotationService extends TransactionBaseService {
       relations: [],
       skip: 0,
       take: 20,
-    }
+    },
+    region_Id = ''
   ): Promise<[Quotation[], number]> {
     const manager = this.manager_
     const quotationRepo = manager.getCustomRepository(this.quotationRepository_)
 
     const { q, query, relations } = this.prepareListQuery_(selector, config)
+    // @ts-ignore
+    region_Id && (query.where = {...query.where, region_id: region_Id})
 
     if (q) {
       return await quotationRepo.getFreeTextSearchResultsAndCount(

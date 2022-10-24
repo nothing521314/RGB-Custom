@@ -161,11 +161,18 @@ class ProductService extends TransactionBaseService {
             skip: 0,
             take: 20,
             include_discount_prices: false,
-        }
+        },
+        region_Id = ''
     ): Promise<[Product[], number]> {
         const manager = this.manager_
         const productRepo = manager.getCustomRepository(this.productRepository_)
         const {q, query, relations} = this.prepareListQuery_(selector, config)
+
+        // @ts-ignore
+        region_Id && (query.where = (qb) => {
+            qb.where('prices.region_id = :region_id', {
+                region_id: region_Id
+            })})
 
         if (q) {
             return await productRepo.getFreeTextSearchResultsAndCount(

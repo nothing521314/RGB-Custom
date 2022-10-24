@@ -210,7 +210,8 @@ export default async (req, res) => {
 
   const [rawProducts, count] = await productService.listAndCount(
     req.filterableFields,
-    req.listConfig
+    req.listConfig,
+      req?.cookies?.activeRegion
   )
 
   let products: (Product | PricedProduct)[] = rawProducts

@@ -58,6 +58,7 @@ export class ProductRepository extends Repository<Product> {
 
     const qb = this.createQueryBuilder("product")
       .select(["product.id"])
+        .leftJoin("product.prices", "prices")
       .skip(optionsWithoutRelations.skip)
       .take(optionsWithoutRelations.take)
 
@@ -214,6 +215,7 @@ export class ProductRepository extends Repository<Product> {
       // @ts-ignore
       entities = await this.findByIds(idsOrOptionsWithoutRelations, {
         withDeleted: idsOrOptionsWithoutRelations.withDeleted ?? false,
+        relations: ['prices'],
         order: ['updated_at', 'DESC']
       })
       count = entities.length
@@ -251,6 +253,7 @@ export class ProductRepository extends Repository<Product> {
     )
 
     const entitiesAndRelations = entitiesIdsWithRelations.concat(entities)
+
     const entitiesToReturn =
       this.mergeEntitiesWithRelations(entitiesAndRelations)
 

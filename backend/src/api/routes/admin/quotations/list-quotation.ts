@@ -1,8 +1,8 @@
-import { IsNumber, IsOptional, IsString } from "class-validator"
+import {IsNumber, IsOptional, IsString} from "class-validator"
 import {QuotationService} from "../../../../services"
 
-import { FilterableProductProps } from "../../../../types/product"
-import { Type } from "class-transformer"
+import {FilterableProductProps} from "../../../../types/product"
+import {Type} from "class-transformer"
 import {FilterableQuotationProps} from "../../../../types/quotation";
 
 /**
@@ -202,39 +202,40 @@ import {FilterableQuotationProps} from "../../../../types/quotation";
  *     $ref: "#/components/responses/500_error"
  */
 export default async (req, res) => {
-  const quotationService: QuotationService = req.scope.resolve("quotationService")
+    const quotationService: QuotationService = req.scope.resolve("quotationService")
 
-  const { skip, take } = req.listConfig
+    const {skip, take} = req.listConfig
 
-  const [quotations, count] = await quotationService.listAndCount(
-    req.filterableFields,
-    req.listConfig
-  )
+    const [quotations, count] = await quotationService.listAndCount(
+        req.filterableFields,
+        req.listConfig,
+        req?.cookies?.activeRegion
+    )
 
-  res.json({
-    quotations,
-    count,
-    offset: skip,
-    limit: take,
-  })
+    res.json({
+        quotations,
+        count,
+        offset: skip,
+        limit: take,
+    })
 }
 
 export class AdminGetQuotationParams extends FilterableQuotationProps {
-  @IsNumber()
-  @IsOptional()
-  @Type(() => Number)
-  offset?: number = 0
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    offset?: number = 0
 
-  @IsNumber()
-  @IsOptional()
-  @Type(() => Number)
-  limit?: number = 50
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    limit?: number = 50
 
-  @IsString()
-  @IsOptional()
-  expand?: string
+    @IsString()
+    @IsOptional()
+    expand?: string
 
-  @IsString()
-  @IsOptional()
-  fields?: string
+    @IsString()
+    @IsOptional()
+    fields?: string
 }
