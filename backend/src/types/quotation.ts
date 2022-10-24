@@ -83,7 +83,7 @@ export type CreateQuotationInput = {
 export type CreateQuotationLineInput = {
     product_id: string
     volume: number
-    game: string
+    game: string[]
     child_product?: CreateQuotationLineChildInput[]
 }
 

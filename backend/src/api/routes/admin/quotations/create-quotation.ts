@@ -133,8 +133,8 @@ export class AdminPostQuotationLineReq {
 
   @IsOptional()
   @IsNotEmpty()
-  @IsString()
-  game: string
+  @IsArray()
+  game: string[]
 
   @IsOptional()
   @Type(() => AdminPostQuotationLineChildReq)

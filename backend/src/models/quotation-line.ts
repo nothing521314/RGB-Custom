@@ -37,8 +37,8 @@ export class QuotationLine extends SoftDeletableEntity {
   @Column({ type: "int", nullable: false })
   unit_price: number
 
-  @Column({ type: "text", nullable: true })
-  game: string
+  @Column("text", {array: true, nullable: true})
+  game: string[]
 
 
   @OneToMany(() => QuotationLine, (i) => i.parent_product, { cascade: true, nullable: true})
