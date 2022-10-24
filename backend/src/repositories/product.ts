@@ -359,6 +359,7 @@ export class ProductRepository extends Repository<Product> {
     let qb = this.createQueryBuilder("product")
       .leftJoinAndSelect("product.variants", "variant")
       .leftJoinAndSelect("product.collection", "collection")
+      .leftJoinAndSelect("product.prices", "prices")
       .select(["product.id"])
       .where(cleanedOptions.where)
       .andWhere(
