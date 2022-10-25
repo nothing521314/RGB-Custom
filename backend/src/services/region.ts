@@ -654,7 +654,7 @@ class RegionService extends TransactionBaseService {
         const regionRepo = this.manager_.getCustomRepository(this.regionRepository_)
 
         return await regionRepo.createQueryBuilder("region")
-            .where("region.name LIKE :name OR region.currency_code LIKE :name", {name: `%${query}%`})
+            .where("region.name ILIKE :name OR region.currency_code ILIKE :name", {name: `%${query}%`})
             .leftJoin('region.users', 'users')
             .loadRelationCountAndMap('region.user_count', 'region.users') // count posts for each user
             .leftJoin('region.product_prices', 'product_prices')
