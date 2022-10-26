@@ -32,7 +32,7 @@ export class Quotation extends SoftDeletableEntity {
   @Column()
   code: string
 
-  @Column({ type: "date", nullable: true })
+  @Column({ type: "timestamptz", nullable: true })
   date: Date | null
 
   @Index()
