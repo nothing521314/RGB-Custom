@@ -10,7 +10,7 @@ import {
   IsNumber,
   IsObject,
   IsOptional,
-  IsString,
+  IsString, Max,
   ValidateNested,
 } from "class-validator"
 import {
@@ -355,6 +355,7 @@ export class AdminPostProductsReq {
 
   @IsNumber()
   @IsOptional()
+  @Max(9999999999)
   weight?: number
 
   @IsString()
