@@ -1,4 +1,5 @@
 import UserService from "../../../../services/user"
+import {User} from "../../../../models";
 
 /**
  * @oas [get] /users
@@ -52,15 +53,24 @@ import UserService from "../../../../services/user"
  *     $ref: "#/components/responses/500_error"
  */
 export default async (req, res) => {
-  const {q, ...rest} = req.query
+  const {q} = req.query
   const userService: UserService = req.scope.resolve("userService")
 
-  let users
+  const limit = +req?.query?.limit || 20
+  const offset = +req?.query?.offset || 0
+
+  let users: User[]
+  let number: number
 
   if(q)
-    users = await userService.filter(q)
+    [users, number] = await userService.filter(q, offset, limit)
   else
-    users = await userService.list({})
+    [users, number] = await userService.list(offset, limit)
 
-  res.status(200).json({ users })
+  res.status(200).json({
+    users,
+    count: number,
+    offset: offset,
+    limit: limit
+  })
 }

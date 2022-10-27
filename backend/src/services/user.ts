@@ -57,16 +57,22 @@ class UserService extends TransactionBaseService {
      * @param {Object} config - the configuration object for the query
      * @return {Promise} the result of the find operation
      */
-    async list(selector: FilterableUserProps, config = {}): Promise<User[]> {
+    async list(offset = 0, limit = 20): Promise<[User[], number]> {
         const manager = this.manager_
         const userRepo = manager.getCustomRepository(this.userRepository_)
-        return await userRepo.find(buildQuery(selector, config))
+        const number = await userRepo.count()
+        const users = await userRepo.find({
+            skip: offset,
+            take: limit,
+        })
+
+        return [users, number]
     }
 
-    async filter(query: string): Promise<User[]> {
+    async filter(query: string, offset = 0, limit = 20): Promise<[User[], number]> {
         const manager = this.manager_
         const userRepo = manager.getCustomRepository(this.userRepository_)
-        return await userRepo.find({
+        const number = await userRepo.count({
             where: [
                 {
                     name: Like(`%${query}%`),
@@ -75,6 +81,19 @@ class UserService extends TransactionBaseService {
                 }
             ]
         })
+        const users = await userRepo.find({
+            where: [
+                {
+                    name: Like(`%${query}%`),
+                }, {
+                    email: Like(`%${query}%`)
+                }
+            ],
+            skip: offset,
+            take: limit,
+        })
+
+        return [users, number]
     }
 
     /**
