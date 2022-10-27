@@ -206,18 +206,18 @@ export default async (req, res) => {
   const productService: ProductService = req.scope.resolve("productService")
   const pricingService: PricingService = req.scope.resolve("pricingService")
 
-  const { limit, offset, relations } = req.listConfig
+  const {skip, take, relations} = req.listConfig
 
   const [rawProducts, count] = await productService.listAndCount(
-    req.filterableFields,
-    req.listConfig,
+      req.filterableFields,
+      req.listConfig,
       req?.cookies?.activeRegion
   )
 
   let products: (Product | PricedProduct)[] = rawProducts
 
   const includesPricing = ["variants", "variants.prices"].every((relation) =>
-    relations?.includes(relation)
+      relations?.includes(relation)
   )
   if (includesPricing) {
     products = await pricingService.setProductPrices(rawProducts)
@@ -226,8 +226,8 @@ export default async (req, res) => {
   res.json({
     products,
     count,
-    offset: offset,
-    limit: limit,
+    offset: skip,
+    limit: take
   })
 }
 
