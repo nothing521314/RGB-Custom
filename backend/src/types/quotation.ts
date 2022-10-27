@@ -30,7 +30,7 @@ export class FilterableQuotationProps {
 
     @IsString()
     @IsOptional()
-    sale_persion?: string
+    sale_persion_id?: string
 
     @IsString()
     @IsOptional()
