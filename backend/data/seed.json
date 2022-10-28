@@ -7,11 +7,6 @@
       "email": "admin@admin.com",
       "password": "admin",
       "role": "admin"
-    },
-    {
-      "email": "sale.man@admin.com",
-      "password": "saleman",
-      "role": "admin"
     }
   ],
   "productCollections": [
@@ -33,8 +28,8 @@
   ],
   "regions": [
     {
-      "id": "region-vietname",
-      "name": "Viet Nam",
+      "id": "region-vietnam",
+      "name": "Vietnam",
       "currency_code": "usd",
       "tax_rate": 0,
       "payment_providers": [],
