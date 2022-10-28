@@ -64,6 +64,9 @@ class UserService extends TransactionBaseService {
         const users = await userRepo.find({
             skip: offset,
             take: limit,
+            order: {
+                created_at: "DESC"
+            }
         })
 
         return [users, number]
@@ -91,6 +94,9 @@ class UserService extends TransactionBaseService {
             ],
             skip: offset,
             take: limit,
+            order: {
+                created_at: "DESC"
+            }
         })
 
         return [users, number]

@@ -44,6 +44,8 @@ export class CustomerRepository extends Repository<Customer> {
       })
     }
 
+    qb.orderBy('customer.created_at', 'DESC')
+
     return await qb.getManyAndCount()
   }
 }
