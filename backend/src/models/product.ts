@@ -108,7 +108,7 @@ export class Product extends SoftDeletableEntity {
   @JoinColumn({ name: "profile_id" })
   profile: ShippingProfile
 
-  @Column({ type: "int", nullable: true })
+  @Column("decimal", { precision: 11, scale: 2, nullable: true})
   weight: number | null
 
   @Column({ type: "int", nullable: true })

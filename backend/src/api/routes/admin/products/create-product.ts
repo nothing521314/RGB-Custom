@@ -353,7 +353,7 @@ export class AdminPostProductsReq {
   @ArrayMinSize(1)
   prices: ProductPriceReq[]
 
-  @IsNumber()
+  @IsNumber({maxDecimalPlaces: 2})
   @IsOptional()
   @Max(9999999999)
   weight?: number
